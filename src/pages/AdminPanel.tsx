@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import type { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
