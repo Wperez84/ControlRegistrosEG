@@ -8,7 +8,12 @@ import { normLink } from '../lib/normLink';
 
 const SUPER_ADMINS = ['wperez@laprensagrafica.com', 'chuete@laprensagrafica.com'];
 const REDES = ['INSTAGRAM', 'FACEBOOK', 'YOUTUBE', 'X', 'TIKTOK', 'SITIO WEB', 'OTRO'] as const;
-const MARCAS = ['El Gráfico', 'La Prensa Gráfica', 'Mi Chero', 'Guriguiri', 'El Economista', 'Campus', 'EllaSv'];
+const MARCAS = ['LPG', 'EG', 'EGTV', 'GuiriGuiri', 'Mi Chero', 'Ellasv', 'El Economista', 'Departamento15', 'Campus'];
+const TIPOS_PAUTA = [
+  'Enlace', 'Logo Rotativo en Pantalla', 'Pleca Horizontal/Pleca L', 'Product Placement',
+  'Reels Varios', 'Menciones', 'Entrevista', 'Spot', 'Cuñas', 'Cortina',
+  'Post en Redes Sociales', 'Spot/Mención/Pleca',
+] as const;
 
 const LINK_DOMINIOS: Partial<Record<string, string[]>> = {
   INSTAGRAM: ['instagram.com'],
@@ -242,7 +247,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
           <thead>
             <tr className="border-b border-gray-100">
               <th className="pb-2 pr-5 text-left"><SortBtn col="fecha" label="Fecha" /></th>
-              {['Proyecto', 'Cliente', 'Red', 'Marca', 'Sección'].map(h => (
+              {['Proyecto', 'Cliente', 'Red', 'Marca', 'Tipo de Pauta', 'Sección'].map(h => (
                 <th key={h} className="pb-2 pr-5 text-left text-[9px] tracking-widest uppercase text-gray-400 font-medium whitespace-nowrap">{h}</th>
               ))}
               <th className="pb-2 pr-5 text-left"><SortBtn col="alcances" label="Alcance" /></th>
@@ -269,6 +274,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
                 </td>
                 <td className="py-2 pr-5 text-gray-500 text-[10px]">{r.red}</td>
                 <td className="py-2 pr-5 text-gray-400 text-[10px]">{r.marca}</td>
+                <td className="py-2 pr-5 text-gray-400 text-[10px] max-w-[130px] truncate">{r.tipoPauta}</td>
                 <td className="py-2 pr-5 text-gray-400 text-[10px] max-w-[90px] truncate">{r.seccion || '—'}</td>
                 <td className="py-2 pr-5 text-blue-500 text-[10px] font-medium tabular-nums">{r.alcances ? Number(r.alcances).toLocaleString() : '—'}</td>
                 <td className="py-2 pr-5 text-emerald-500 text-[10px] font-medium tabular-nums">{r.interacciones ? Number(r.interacciones).toLocaleString() : '—'}</td>
@@ -286,7 +292,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={10} className="py-16 text-center text-gray-300 text-sm">Sin registros</td></tr>
+              <tr><td colSpan={11} className="py-16 text-center text-gray-300 text-sm">Sin registros</td></tr>
             )}
           </tbody>
         </table>
@@ -303,7 +309,8 @@ function FormRegistro({ productos, clientes, onSubmit, onCancel }: {
 }) {
   const [form, setForm] = useState({
     productoId: '', clienteId: '', red: 'INSTAGRAM' as Registro['red'],
-    marca: MARCAS[0], link: '', seccion: '', categoria: '',
+    marca: MARCAS[0], tipoPauta: TIPOS_PAUTA[0] as Registro['tipoPauta'],
+    link: '', seccion: '', categoria: '',
     fecha: new Date().toISOString().slice(0, 10), notas: '',
   });
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -341,9 +348,15 @@ function FormRegistro({ productos, clientes, onSubmit, onCancel }: {
           </select>
         </div>
         <div>
-          <label className="text-[10px] text-gray-800 uppercase tracking-widest">Marca</label>
+          <label className="text-[10px] text-gray-800 uppercase tracking-widest">Marca Editorial</label>
           <select value={form.marca} onChange={e => set('marca', e.target.value)} className={sel + " mt-1"}>
             {MARCAS.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-[10px] text-gray-800 uppercase tracking-widest">Tipo de Pauta</label>
+          <select value={form.tipoPauta} onChange={e => set('tipoPauta', e.target.value)} className={sel + " mt-1"}>
+            {TIPOS_PAUTA.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
         <div className="col-span-2">

@@ -7,8 +7,12 @@ export interface Producto {
 export interface Cliente { id: string; nombre: string; color: string; activo: boolean; creadoEn: number; }
 export type Red = 'INSTAGRAM' | 'FACEBOOK' | 'YOUTUBE' | 'X' | 'TIKTOK' | 'SITIO WEB' | 'OTRO';
 export type Marca = string;
+export type TipoPauta =
+  | 'Enlace' | 'Logo Rotativo en Pantalla' | 'Pleca Horizontal/Pleca L' | 'Product Placement'
+  | 'Reels Varios' | 'Menciones' | 'Entrevista' | 'Spot' | 'Cuñas' | 'Cortina'
+  | 'Post en Redes Sociales' | 'Spot/Mención/Pleca';
 export interface Registro {
-  id: string; productoId: string; clienteId: string; red: Red; marca: Marca;
+  id: string; productoId: string; clienteId: string; red: Red; marca: Marca; tipoPauta: TipoPauta;
   link: string; seccion?: string; categoria?: string; fecha: string;
   notas?: string; creadoEn: number; creadoPor: string; guardado?: boolean;
 }
