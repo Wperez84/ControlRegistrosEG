@@ -7,7 +7,8 @@
     "allowImportingTsExtensions": true, "isolatedModules": true,
     "moduleDetection": "force", "noEmit": true, "jsx": "react-jsx",
     "strict": true, "noUnusedLocals": true, "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true, "verbatimModuleSyntax": true
+    "noFallthroughCasesInSwitch": true, "verbatimModuleSyntax": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["src", "firebase-applet-config.json"]
 }
