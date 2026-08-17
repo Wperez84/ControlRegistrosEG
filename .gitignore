@@ -1,0 +1,12 @@
+logs
+*.log
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.local
+backups/
+*.csv
+.firebase/
+.DS_Store
