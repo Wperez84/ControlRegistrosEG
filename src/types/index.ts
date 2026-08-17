@@ -13,7 +13,7 @@ export type TipoPauta =
   | 'Post en Redes Sociales' | 'Spot/Mención/Pleca';
 export interface Registro {
   id: string; productoId: string; clienteId: string; red: Red; marca: Marca; tipoPauta: TipoPauta;
-  link: string; seccion?: string; categoria?: string; fecha: string;
+  link: string; categoria?: string; fecha: string;
   notas?: string; creadoEn: number; creadoPor: string; guardado?: boolean;
 }
 export interface Metrica { registroId: string; alcances?: number; interacciones?: number; actualizadoEn: number; }

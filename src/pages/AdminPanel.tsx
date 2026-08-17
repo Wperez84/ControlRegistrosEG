@@ -247,7 +247,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
           <thead>
             <tr className="border-b border-gray-100">
               <th className="pb-2 pr-5 text-left"><SortBtn col="fecha" label="Fecha" /></th>
-              {['Proyecto', 'Cliente', 'Red', 'Marca', 'Tipo de Pauta', 'Sección'].map(h => (
+              {['Proyecto', 'Cliente', 'Red', 'Marca', 'Tipo de Pauta'].map(h => (
                 <th key={h} className="pb-2 pr-5 text-left text-[9px] tracking-widest uppercase text-gray-400 font-medium whitespace-nowrap">{h}</th>
               ))}
               <th className="pb-2 pr-5 text-left"><SortBtn col="alcances" label="Alcance" /></th>
@@ -275,7 +275,6 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
                 <td className="py-2 pr-5 text-gray-500 text-[10px]">{r.red}</td>
                 <td className="py-2 pr-5 text-gray-400 text-[10px]">{r.marca}</td>
                 <td className="py-2 pr-5 text-gray-400 text-[10px] max-w-[130px] truncate">{r.tipoPauta}</td>
-                <td className="py-2 pr-5 text-gray-400 text-[10px] max-w-[90px] truncate">{r.seccion || '—'}</td>
                 <td className="py-2 pr-5 text-blue-500 text-[10px] font-medium tabular-nums">{r.alcances ? Number(r.alcances).toLocaleString() : '—'}</td>
                 <td className="py-2 pr-5 text-emerald-500 text-[10px] font-medium tabular-nums">{r.interacciones ? Number(r.interacciones).toLocaleString() : '—'}</td>
                 <td className="py-2 pr-5 max-w-[160px] truncate">
@@ -292,7 +291,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={11} className="py-16 text-center text-gray-300 text-sm">Sin registros</td></tr>
+              <tr><td colSpan={10} className="py-16 text-center text-gray-300 text-sm">Sin registros</td></tr>
             )}
           </tbody>
         </table>
@@ -310,7 +309,7 @@ function FormRegistro({ productos, clientes, onSubmit, onCancel }: {
   const [form, setForm] = useState({
     productoId: '', clienteId: '', red: 'INSTAGRAM' as Registro['red'],
     marca: MARCAS[0], tipoPauta: TIPOS_PAUTA[0] as Registro['tipoPauta'],
-    link: '', seccion: '', categoria: '',
+    link: '', categoria: '',
     fecha: new Date().toISOString().slice(0, 10), notas: '',
   });
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -364,10 +363,6 @@ function FormRegistro({ productos, clientes, onSubmit, onCancel }: {
           <input required value={form.link} onChange={e => set('link', e.target.value)} placeholder="https://…"
             className={inp + " mt-1 " + (linkError ? 'border-red-400' : '')} />
           {linkError && <p className="text-[10px] text-red-400 mt-1">{linkError}</p>}
-        </div>
-        <div>
-          <label className="text-[10px] text-gray-800 uppercase tracking-widest">Sección</label>
-          <input value={form.seccion} onChange={e => set('seccion', e.target.value)} placeholder="Previa…" className={inp + " mt-1"} />
         </div>
         <div>
           <label className="text-[10px] text-gray-800 uppercase tracking-widest">Fecha</label>
