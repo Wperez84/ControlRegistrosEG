@@ -182,6 +182,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
   filtroRed: string;
 }) {
   const [showForm, setShowForm] = useState(false);
+  const [editando, setEditando] = useState<RegistroCompleto | null>(null);
   const [sortCol, setSortCol] = useState<'fecha' | 'alcances' | 'interacciones' | null>(null);
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
   const isAdmin = SUPER_ADMINS.includes(user.email ?? '');
@@ -209,6 +210,14 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
     await addDoc(collection(db, 'registros'), { ...data, creadoEn: Date.now(), creadoPor: user.uid });
     await addDoc(collection(db, 'actividad'), { email: user.email, link: data.link, red: data.red, clienteId: data.clienteId, productoId: data.productoId, ts: Date.now() });
     setShowForm(false);
+  }
+
+  async function handleGuardarEdicion(data: Omit<Registro, 'id' | 'creadoEn' | 'creadoPor'>) {
+    if (!editando) return;
+    await updateDoc(doc(db, 'registros', editando.id), {
+      ...data, editado: true, editadoEn: Date.now(), editadoPor: user.uid,
+    });
+    setEditando(null);
   }
 
   async function handleEliminar(r: RegistroCompleto) {
@@ -242,6 +251,16 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
         </div>
       )}
 
+      {editando && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setEditando(null)}>
+          <div onClick={e => e.stopPropagation()} className="bg-white rounded-2xl shadow-xl w-[90vw] max-w-5xl mx-6 overflow-hidden">
+            <FormRegistro productos={productos.filter(p => p.activo || p.id === editando.productoId)} clientes={clientes}
+              initial={editando} titulo="Editar registro"
+              onSubmit={handleGuardarEdicion} onCancel={() => setEditando(null)} />
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -259,7 +278,15 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
           <tbody className="divide-y divide-gray-100">
             {filtered.map(r => (
               <tr key={r.id} className="hover:bg-gray-50 transition-colors group">
-                <td className="py-2 pr-5 text-gray-500 font-mono text-[10px] whitespace-nowrap">{r.fecha}</td>
+                <td className="py-2 pr-5 text-gray-500 font-mono text-[10px] whitespace-nowrap">
+                  {r.fecha}
+                  {r.editado && (
+                    <span title={r.editadoEn ? `Editado el ${new Date(r.editadoEn).toLocaleString()}` : 'Editado'}
+                      className="ml-1.5 text-[8px] font-sans font-medium uppercase tracking-wide text-amber-500 bg-amber-50 rounded px-1 py-0.5">
+                      editado
+                    </span>
+                  )}
+                </td>
                 <td className="py-2 pr-5 max-w-[150px] truncate">
                   <span className="text-[11px] font-medium px-1.5 py-0.5 rounded"
                     style={r.productoColor ? { backgroundColor: r.productoColor + '22', color: r.productoColor } : { color: '#6b7280' }}>
@@ -280,12 +307,18 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
                 <td className="py-2 pr-5 max-w-[160px] truncate">
                   <a href={r.link} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-700 text-[10px] transition-colors">{r.link}</a>
                 </td>
-                <td className="py-2">
+                <td className="py-2 whitespace-nowrap">
                   {(isAdmin || r.creadoPor === user.uid) && (
-                    <button onClick={() => handleEliminar(r)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-400 text-[10px] px-1">
-                      ✕
-                    </button>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => setEditando(r)}
+                        className="text-gray-300 hover:text-blue-400 text-[10px] px-1">
+                        ✎
+                      </button>
+                      <button onClick={() => handleEliminar(r)}
+                        className="text-gray-300 hover:text-red-400 text-[10px] px-1">
+                        ✕
+                      </button>
+                    </span>
                   )}
                 </td>
               </tr>
@@ -300,17 +333,21 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
   );
 }
 
-function FormRegistro({ productos, clientes, onSubmit, onCancel }: {
+function FormRegistro({ productos, clientes, initial, titulo, onSubmit, onCancel }: {
   productos: Producto[];
   clientes: Cliente[];
+  initial?: Registro;
+  titulo?: string;
   onSubmit: (data: Omit<Registro, 'id' | 'creadoEn' | 'creadoPor'>) => void;
   onCancel: () => void;
 }) {
   const [form, setForm] = useState({
-    productoId: '', clienteId: '', red: 'INSTAGRAM' as Registro['red'],
-    marca: MARCAS[0], tipoPauta: TIPOS_PAUTA[0] as Registro['tipoPauta'],
-    link: '', categoria: '',
-    fecha: new Date().toISOString().slice(0, 10), notas: '',
+    productoId: initial?.productoId ?? '', clienteId: initial?.clienteId ?? '',
+    red: (initial?.red ?? 'INSTAGRAM') as Registro['red'],
+    marca: initial?.marca ?? MARCAS[0],
+    tipoPauta: (initial?.tipoPauta ?? TIPOS_PAUTA[0]) as Registro['tipoPauta'],
+    link: initial?.link ?? '', categoria: initial?.categoria ?? '',
+    fecha: initial?.fecha ?? new Date().toISOString().slice(0, 10), notas: initial?.notas ?? '',
   });
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
   const linkError = form.link ? validarLink(form.link, form.red) : null;
@@ -319,12 +356,12 @@ function FormRegistro({ productos, clientes, onSubmit, onCancel }: {
     e.preventDefault();
     if (!form.productoId || !form.clienteId || !form.link) return;
     if (linkError) return;
-    onSubmit({ ...form, guardado: false });
+    onSubmit({ ...form, guardado: initial?.guardado ?? false });
   }
 
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-5">
-      <p className="text-xs font-semibold text-gray-700">Nuevo registro</p>
+      <p className="text-xs font-semibold text-gray-700">{titulo ?? 'Nuevo registro'}</p>
       <div className="grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-4">
         <div>
           <label className="text-[10px] text-gray-800 uppercase tracking-widest">Proyecto *</label>

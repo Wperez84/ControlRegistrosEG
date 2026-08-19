@@ -20,7 +20,10 @@ service cloud.firestore {
     match /registros/{registroId} {
       allow read: if isEditor() || isClienteAutorizado(resource.data.clienteId);
       allow create: if isEditor();
-      allow update, delete: if isAdmin() || (isEditor() && request.auth.uid == resource.data.creadoPor);
+      allow update: if (isAdmin() || (isEditor() && request.auth.uid == resource.data.creadoPor))
+        && request.resource.data.creadoPor == resource.data.creadoPor
+        && request.resource.data.creadoEn == resource.data.creadoEn;
+      allow delete: if isAdmin() || (isEditor() && request.auth.uid == resource.data.creadoPor);
     }
     match /metricas/{registroId} { allow read: if isEditor() || isClienteAutorizado(resource.data.clienteId); allow write: if false; }
     match /presence/{uid} { allow read: if isAdmin(); allow write: if isEditor() && request.auth.uid == uid; }

@@ -15,6 +15,7 @@ export interface Registro {
   id: string; productoId: string; clienteId: string; red: Red; marca: Marca; tipoPauta: TipoPauta;
   link: string; categoria?: string; fecha: string;
   notas?: string; creadoEn: number; creadoPor: string; guardado?: boolean;
+  editado?: boolean; editadoEn?: number; editadoPor?: string;
 }
 export interface Metrica { registroId: string; alcances?: number; interacciones?: number; actualizadoEn: number; }
 export interface UsuarioInterno { uid: string; email: string; rol: 'admin' | 'editor'; }
