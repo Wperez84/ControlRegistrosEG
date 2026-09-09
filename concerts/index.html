@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Descubre todos los conciertos en El Salvador, compra entradas online, conoce precios y ubicaciones geográficas.">
+  <meta name="keywords" content="conciertos El Salvador, entradas, música, ticketera, eventos">
+  <title>Conciertos en El Salvador - Descubre Eventos Musicales</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div>
+        <h1>🎵 Conciertos El Salvador</h1>
+        <p class="subtitle">Descubre todos los eventos musicales con precios y geolocalización</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Filtros -->
+    <div class="filters">
+      <div class="filter-group">
+        <label for="searchInput">🔍 Buscar</label>
+        <input type="text" id="searchInput" placeholder="Artista, concierto...">
+      </div>
+
+      <div class="filter-group">
+        <label for="genreFilter">🎸 Género</label>
+        <select id="genreFilter">
+          <option value="">Todos los géneros</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="cityFilter">🏙️ Ciudad</label>
+        <select id="cityFilter">
+          <option value="">Todas las ciudades</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Grid de Conciertos -->
+    <div id="concertsGrid" class="concerts-grid">
+      <div class="no-concerts">Cargando conciertos...</div>
+    </div>
+  </div>
+
+  <!-- Modal para detalles del concierto y compra -->
+  <div id="concertModal" class="modal">
+    <div class="modal-content">
+      <!-- Contenido dinámico aquí -->
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Conciertos El Salvador. Todos los derechos reservados.</p>
+    <p>Disfruta la música en vivo de manera segura y cómoda 🎵</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
