@@ -10,3 +10,4 @@ backups/
 *.csv
 .firebase/
 .DS_Store
+.vercel

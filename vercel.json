@@ -1,0 +1,11 @@
+{
+  "buildCommand": "echo 'Build complete'",
+  "outputDirectory": "concerts",
+  "framework": "static",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/concerts/$1"
+    }
+  ]
+}
