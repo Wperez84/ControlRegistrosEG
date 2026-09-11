@@ -249,7 +249,7 @@
 
         <div class="info-box">
             📌 <strong>Metodología:</strong> Se compara el mismo período relativo antes del evento.
-            2025: evento 14-16 octubre. 2026: evento estimado ~30 octubre.
+            2025: evento 14-16 octubre. 2026: evento 21 de octubre.
             Semana relativa = semanas antes del evento. Solo se muestran datos reales, sin estimaciones.
         </div>
 
@@ -267,8 +267,8 @@
                 <div class="stat-label">Brecha (-94.8%)</div>
             </div>
             <div class="stat-card" style="border-left-color: var(--warning);">
-                <div class="stat-value" style="color: var(--warning);">~3 sem</div>
-                <div class="stat-label">Hasta evento 2026</div>
+                <div class="stat-value" style="color: var(--warning);">~5 sem</div>
+                <div class="stat-label">Hasta evento (21 Oct)</div>
             </div>
         </div>
 
@@ -299,16 +299,18 @@
     <script>
         // Datos finales verificados: 2025 = 212 total, 2026 = 11 total
         // Estructura por semana relativa (semanas antes del evento)
+        // 2025 evento: 14-16 Oct | 2026 evento: 21 Oct
         const data = [
-            {semana: '8 sem antes', fechas25: 'Ago 16-22', fechas26: 'Ago 2-8', a2025: 4, a2026: 0},
-            {semana: '7 sem antes', fechas25: 'Ago 23-29', fechas26: 'Ago 9-15', a2025: 0, a2026: 0},
-            {semana: '6 sem antes', fechas25: 'Ago 30-Sep 5', fechas26: 'Ago 16-22', a2025: 4, a2026: 2},
-            {semana: '5 sem antes', fechas25: 'Sep 6-12', fechas26: 'Ago 23-29', a2025: 13, a2026: 0},
-            {semana: '4 sem antes', fechas25: 'Sep 13-19', fechas26: 'Ago 30-Sep 5', a2025: 24, a2026: 5},
-            {semana: '3 sem antes', fechas25: 'Sep 20-26', fechas26: 'Sep 6-12', a2025: 38, a2026: 4},
-            {semana: '2 sem antes', fechas25: 'Sep 27-Oct 3', fechas26: 'Sep 13-19', a2025: 32, a2026: 0},
-            {semana: '1 sem antes', fechas25: 'Oct 4-10', fechas26: 'Sep 20-26', a2025: 29, a2026: 0},
-            {semana: 'Evento', fechas25: 'Oct 14-16', fechas26: '~Oct 30', a2025: 68, a2026: 0}
+            {semana: '9 sem antes', fechas25: 'Ago 9-15', fechas26: 'Ago 19-25', a2025: 0, a2026: 2},
+            {semana: '8 sem antes', fechas25: 'Ago 16-22', fechas26: 'Ago 26-Sep 1', a2025: 4, a2026: 2},
+            {semana: '7 sem antes', fechas25: 'Ago 23-29', fechas26: 'Sep 2-8', a2025: 0, a2026: 3},
+            {semana: '6 sem antes', fechas25: 'Ago 30-Sep 5', fechas26: 'Sep 9-15', a2025: 4, a2026: 4},
+            {semana: '5 sem antes', fechas25: 'Sep 6-12', fechas26: 'Sep 16-22', a2025: 13, a2026: 0},
+            {semana: '4 sem antes', fechas25: 'Sep 13-19', fechas26: 'Sep 23-29', a2025: 24, a2026: 0},
+            {semana: '3 sem antes', fechas25: 'Sep 20-26', fechas26: 'Sep 30-Oct 6', a2025: 38, a2026: 0},
+            {semana: '2 sem antes', fechas25: 'Sep 27-Oct 3', fechas26: 'Oct 7-13', a2025: 32, a2026: 0},
+            {semana: '1 sem antes', fechas25: 'Oct 4-10', fechas26: 'Oct 14-20', a2025: 29, a2026: 0},
+            {semana: 'Evento', fechas25: 'Oct 14-16', fechas26: 'Oct 21', a2025: 68, a2026: 0}
         ];
 
         // Gráfico
