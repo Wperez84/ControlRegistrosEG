@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparativa Final: 2025 vs 2026 (Datos Reales)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --surface: #FFFFFF;
+            --surface-dark: #F9FAFB;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface: #111827;
+                --surface-dark: #1F2937;
+                --text-primary: #F3F4F6;
+                --text-secondary: #D1D5DB;
+                --border: #374151;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .alert-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .alert-text {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .stat-card.primary {
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.secondary {
+            border-left: 4px solid var(--secondary);
+        }
+
+        .stat-card.danger {
+            border-left: 4px solid var(--danger);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card.primary .stat-value {
+            color: var(--primary);
+        }
+
+        .stat-card.secondary .stat-value {
+            color: var(--secondary);
+        }
+
+        .stat-card.danger .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .chart-container {
+            background: var(--surface-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            max-height: 350px;
+        }
+
+        .table-container {
+            background: var(--surface-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--surface);
+        }
+
+        .no-data {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .negative {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .positive {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: rgba(79, 70, 229, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎫 Comparativa Asientos: 2025 vs 2026</h1>
+            <p class="subtitle">Datos reales | Por semana relativa | Excluye cortesías | Sin proyecciones</p>
+        </header>
+
+        <div class="alert-box">
+            <div class="alert-title">🚨 CRISIS: Brecha de 201 asientos (94.8% por debajo)</div>
+            <div class="alert-text">
+                2026 lleva 11 asientos vs 212 en 2025. El ritmo de ventas está prácticamente detenido desde mediados de septiembre.
+                Acción inmediata y estrategia de marketing intensiva requerida.
+            </div>
+        </div>
+
+        <div class="info-box">
+            📌 <strong>Metodología:</strong> Se compara el mismo período relativo antes del evento.
+            2025: evento 14-16 octubre. 2026: evento estimado ~30 octubre.
+            Semana relativa = semanas antes del evento. Solo se muestran datos reales, sin estimaciones.
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card secondary">
+                <div class="stat-value">11</div>
+                <div class="stat-label">Asientos 2026 (actual)</div>
+            </div>
+            <div class="stat-card primary">
+                <div class="stat-value">212</div>
+                <div class="stat-label">Asientos 2025 (total)</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-value">-201</div>
+                <div class="stat-label">Brecha (-94.8%)</div>
+            </div>
+            <div class="stat-card" style="border-left-color: var(--warning);">
+                <div class="stat-value" style="color: var(--warning);">~3 sem</div>
+                <div class="stat-label">Hasta evento 2026</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">📊 Asientos Vendidos por Semana Relativa (Antes del Evento)</div>
+            <canvas id="asientosChart"></canvas>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semana Relativa</th>
+                        <th>2025 (Fechas)</th>
+                        <th>2026 (Fechas Est.)</th>
+                        <th>2025 Asientos</th>
+                        <th>2026 Asientos</th>
+                        <th>Diferencia</th>
+                        <th>% vs 2025</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Datos finales verificados: 2025 = 212 total, 2026 = 11 total
+        // Estructura por semana relativa (semanas antes del evento)
+        const data = [
+            {semana: '8 sem antes', fechas25: 'Ago 16-22', fechas26: 'Ago 2-8', a2025: 4, a2026: 0},
+            {semana: '7 sem antes', fechas25: 'Ago 23-29', fechas26: 'Ago 9-15', a2025: 0, a2026: 0},
+            {semana: '6 sem antes', fechas25: 'Ago 30-Sep 5', fechas26: 'Ago 16-22', a2025: 4, a2026: 2},
+            {semana: '5 sem antes', fechas25: 'Sep 6-12', fechas26: 'Ago 23-29', a2025: 13, a2026: 0},
+            {semana: '4 sem antes', fechas25: 'Sep 13-19', fechas26: 'Ago 30-Sep 5', a2025: 24, a2026: 5},
+            {semana: '3 sem antes', fechas25: 'Sep 20-26', fechas26: 'Sep 6-12', a2025: 38, a2026: 4},
+            {semana: '2 sem antes', fechas25: 'Sep 27-Oct 3', fechas26: 'Sep 13-19', a2025: 32, a2026: 0},
+            {semana: '1 sem antes', fechas25: 'Oct 4-10', fechas26: 'Sep 20-26', a2025: 29, a2026: 0},
+            {semana: 'Evento', fechas25: 'Oct 14-16', fechas26: '~Oct 30', a2025: 68, a2026: 0}
+        ];
+
+        // Gráfico
+        const ctx = document.getElementById('asientosChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.semana),
+                datasets: [
+                    {
+                        label: '2025 (Asientos)',
+                        data: data.map(d => d.a2025),
+                        backgroundColor: '#4F46E5',
+                        borderRadius: 4,
+                        borderSkipped: false
+                    },
+                    {
+                        label: '2026 (Asientos)',
+                        data: data.map(d => d.a2026),
+                        backgroundColor: '#10B981',
+                        borderRadius: 4,
+                        borderSkipped: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 10 },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    }
+                }
+            }
+        });
+
+        // Tabla
+        const tableBody = document.getElementById('tableBody');
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+
+            const diff = row.a2026 - row.a2025;
+            const pct = row.a2025 > 0 ? ((row.a2026 / row.a2025) * 100).toFixed(1) : '0.0';
+            const diffClass = diff < 0 ? 'negative' : diff > 0 ? 'positive' : 'neutral';
+
+            tr.innerHTML = `
+                <td><strong>${row.semana}</strong></td>
+                <td><small>${row.fechas25}</small></td>
+                <td><small>${row.fechas26}</small></td>
+                <td>${row.a2025}</td>
+                <td>${row.a2026}</td>
+                <td class="${diffClass}">${diff > 0 ? '+' : ''}${diff}</td>
+                <td>${pct}%</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        // Totales
+        const total2025 = data.reduce((sum, row) => sum + row.a2025, 0);
+        const total2026 = data.reduce((sum, row) => sum + row.a2026, 0);
+        const totalDiff = total2026 - total2025;
+
+        const trTotal = document.createElement('tr');
+        trTotal.style.fontWeight = 'bold';
+        trTotal.style.borderTop = '2px solid var(--primary)';
+        trTotal.innerHTML = `
+            <td colspan="3"><strong>TOTAL</strong></td>
+            <td>${total2025}</td>
+            <td>${total2026}</td>
+            <td class="negative">${totalDiff}</td>
+            <td>${((total2026 / total2025) * 100).toFixed(1)}%</td>
+        `;
+        tableBody.appendChild(trTotal);
+    </script>
+</body>
+</html>
