@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Semanal 2025 - Histórico Real</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --surface: #FFFFFF;
+            --surface-dark: #F9FAFB;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface: #111827;
+                --surface-dark: #1F2937;
+                --text-primary: #F3F4F6;
+                --text-secondary: #D1D5DB;
+                --border: #374151;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--surface-dark);
+            border-left: 4px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .summary-card.secondary {
+            border-left-color: var(--secondary);
+        }
+
+        .summary-card.accent {
+            border-left-color: var(--accent);
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card.secondary .summary-value {
+            color: var(--secondary);
+        }
+
+        .summary-card.accent .summary-value {
+            color: var(--accent);
+        }
+
+        .summary-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--surface-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+
+        .table-section {
+            background: var(--surface-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--surface);
+        }
+
+        .amount {
+            font-weight: 600;
+            text-align: right;
+            color: var(--primary);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .insight-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .insight-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-content {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .highlight {
+            background: rgba(79, 70, 229, 0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border-left: 3px solid var(--primary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Dashboard Semanal 2025</h1>
+            <p class="subtitle">Análisis histórico real | The Pink Gala</p>
+        </header>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-value">$16,960</div>
+                <div class="summary-label">Total Ventas</div>
+            </div>
+            <div class="summary-card secondary">
+                <div class="summary-value">113</div>
+                <div class="summary-label">Total Compras</div>
+            </div>
+            <div class="summary-card accent">
+                <div class="summary-value">$150</div>
+                <div class="summary-label">Ticket Promedio</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">$514</div>
+                <div class="summary-label">Promedio Diario</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">📈 Ventas Semanales</div>
+                <canvas id="weeklyChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">📊 Cantidad de Compras por Semana</div>
+                <canvas id="purchasesChart"></canvas>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <div class="section-title">📋 Análisis Detallado por Semana</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semana</th>
+                        <th>Período</th>
+                        <th>Ventas</th>
+                        <th>Compras</th>
+                        <th>Promedio/Día</th>
+                        <th>% del Total</th>
+                    </tr>
+                </thead>
+                <tbody id="weeklyTable">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-icon">🎯</div>
+                <div class="insight-title">Punto de Activación</div>
+                <div class="insight-content">Semana -5</div>
+                <div class="highlight">
+                    <strong>$2,240 en ventas</strong><br>
+                    Incremento significativo de +700% vs semana anterior
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">📈</div>
+                <div class="insight-title">Semana Crítica</div>
+                <div class="insight-content">Semana -1</div>
+                <div class="highlight">
+                    <strong>$2,960 en ventas | 21 compras</strong><br>
+                    Máximo volumen previo al evento
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🔴</div>
+                <div class="insight-title">Pico Máximo</div>
+                <div class="insight-content">Evento</div>
+                <div class="highlight">
+                    <strong>$3,440 en ventas | 30 compras</strong><br>
+                    Rendimiento superior durante el evento
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">📊</div>
+                <div class="insight-title">Crecimiento Total</div>
+                <div class="insight-content">+450%</div>
+                <div class="highlight">
+                    De Semana -8 ($320) a Semana -1 ($2,960)<br>
+                    Incremento exponencial pre-evento
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const weeklyData = [
+            {semana: -8, ventas: 320, compras: 3, periodo: "20-22 Ago"},
+            {semana: -7, ventas: 0, compras: 0, periodo: "23-29 Ago"},
+            {semana: -6, ventas: 320, compras: 2, periodo: "03-07 Sep"},
+            {semana: -5, ventas: 2240, compras: 13, periodo: "09-15 Sep"},
+            {semana: -4, ventas: 2240, compras: 10, periodo: "16-22 Sep"},
+            {semana: -3, ventas: 2960, compras: 17, periodo: "23-29 Sep"},
+            {semana: -2, ventas: 2480, compras: 17, periodo: "30-06 Oct"},
+            {semana: -1, ventas: 2960, compras: 21, periodo: "07-13 Oct"},
+            {semana: 0, ventas: 3440, compras: 30, periodo: "14-16 Oct"}
+        ];
+
+        // Gráfico de ventas semanales
+        const ctx1 = document.getElementById('weeklyChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Sem -8', 'Sem -7', 'Sem -6', 'Sem -5', 'Sem -4', 'Sem -3', 'Sem -2', 'Sem -1', 'Evento'],
+                datasets: [{
+                    label: 'Ventas ($)',
+                    data: [320, 0, 320, 2240, 2240, 2960, 2480, 2960, 3440],
+                    backgroundColor: ['#4F46E5', '#EF4444', '#4F46E5', '#4F46E5', '#4F46E5', '#4F46E5', '#4F46E5', '#4F46E5', '#10B981'],
+                    borderRadius: 4,
+                    hoverBackgroundColor: '#818CF8'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { usePointStyle: true, padding: 15, font: { size: 11 } } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: v => '$' + (v/1000).toFixed(1) + 'k', font: { size: 10 } },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de compras
+        const ctx2 = document.getElementById('purchasesChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: ['Sem -8', 'Sem -7', 'Sem -6', 'Sem -5', 'Sem -4', 'Sem -3', 'Sem -2', 'Sem -1', 'Evento'],
+                datasets: [{
+                    label: 'Cantidad de Compras',
+                    data: [3, 0, 2, 13, 10, 17, 17, 21, 30],
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#10B981',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { labels: { usePointStyle: true, padding: 15, font: { size: 11 } } } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+
+        // Llenar tabla
+        const totalVentas = 16960;
+        const weeklyTable = document.getElementById('weeklyTable');
+        weeklyData.forEach(row => {
+            const tr = document.createElement('tr');
+            const semanaLabel = row.semana === 0 ? 'Evento' : `Semana ${row.semana}`;
+            const pct = row.ventas > 0 ? ((row.ventas / totalVentas) * 100).toFixed(1) : '0.0';
+            const promedioDiario = row.ventas > 0 ? (row.ventas / 7).toFixed(0) : '0';
+
+            tr.innerHTML = `
+                <td style="font-weight: 600;">${semanaLabel}</td>
+                <td>${row.periodo}</td>
+                <td class="amount">$${row.ventas.toLocaleString()}</td>
+                <td style="text-align: center;">${row.compras}</td>
+                <td class="amount">$${promedioDiario}</td>
+                <td>${pct}%</td>
+            `;
+            weeklyTable.appendChild(tr);
+        });
+    </script>
+</body>
+</html>
