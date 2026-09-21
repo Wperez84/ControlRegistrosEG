@@ -240,10 +240,10 @@
         </header>
 
         <div class="alert-box">
-            <div class="alert-title">🚨 CRISIS: Brecha de 201 asientos (94.8% por debajo)</div>
+            <div class="alert-title">⚠️ ALERTA: Brecha de 192 asientos (90.6% por debajo)</div>
             <div class="alert-text">
-                2026 lleva 11 asientos vs 212 en 2025. El ritmo de ventas está prácticamente detenido desde mediados de septiembre.
-                Acción inmediata y estrategia de marketing intensiva requerida.
+                2026 lleva 20 asientos vs 212 en 2025. Actividad reciente: 9 asientos en últimos 7 días (Sep 13-15).
+                Ritmo todavía muy lento, pero hay movimiento. Continuar con estrategia de marketing intensiva.
             </div>
         </div>
 
@@ -255,7 +255,7 @@
 
         <div class="stats-grid">
             <div class="stat-card secondary">
-                <div class="stat-value">11</div>
+                <div class="stat-value">20</div>
                 <div class="stat-label">Asientos 2026 (actual)</div>
             </div>
             <div class="stat-card primary">
@@ -263,8 +263,8 @@
                 <div class="stat-label">Asientos 2025 (total)</div>
             </div>
             <div class="stat-card danger">
-                <div class="stat-value">-201</div>
-                <div class="stat-label">Brecha (-94.8%)</div>
+                <div class="stat-value">-192</div>
+                <div class="stat-label">Brecha (-90.6%)</div>
             </div>
             <div class="stat-card" style="border-left-color: var(--warning);">
                 <div class="stat-value" style="color: var(--warning);">~5 sem</div>
@@ -297,14 +297,14 @@
     </div>
 
     <script>
-        // Datos finales verificados: 2025 = 212 total, 2026 = 11 total
+        // Datos finales verificados: 2025 = 212 total, 2026 = 20 total (actualizado 21-Sep)
         // Estructura por semana relativa (semanas antes del evento)
         // 2025 evento: 14-16 Oct | 2026 evento: 21 Oct
         const data = [
             {semana: '9 sem antes', fechas25: 'Ago 9-15', fechas26: 'Ago 19-25', a2025: 0, a2026: 2},
             {semana: '8 sem antes', fechas25: 'Ago 16-22', fechas26: 'Ago 26-Sep 1', a2025: 4, a2026: 2},
             {semana: '7 sem antes', fechas25: 'Ago 23-29', fechas26: 'Sep 2-8', a2025: 0, a2026: 3},
-            {semana: '6 sem antes', fechas25: 'Ago 30-Sep 5', fechas26: 'Sep 9-15', a2025: 4, a2026: 4},
+            {semana: '6 sem antes', fechas25: 'Ago 30-Sep 5', fechas26: 'Sep 9-15', a2025: 4, a2026: 13},
             {semana: '5 sem antes', fechas25: 'Sep 6-12', fechas26: 'Sep 16-22', a2025: 13, a2026: 0},
             {semana: '4 sem antes', fechas25: 'Sep 13-19', fechas26: 'Sep 23-29', a2025: 24, a2026: 0},
             {semana: '3 sem antes', fechas25: 'Sep 20-26', fechas26: 'Sep 30-Oct 6', a2025: 38, a2026: 0},
