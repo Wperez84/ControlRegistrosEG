@@ -192,6 +192,30 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
     else { setSortCol(col); setSortDir('desc'); }
   }
 
+  function exportCSV() {
+    const headers = ['Fecha', 'Proyecto', 'Cliente', 'Red', 'Marca', 'Sección', 'Tipo de Pauta', 'Alcance', 'Interacciones', 'Link'];
+    const rows = filtered.map(r => [
+      r.fecha,
+      productos.find(p => p.id === r.productoId)?.nombre ?? r.productoId,
+      clientes.find(c => c.id === r.clienteId)?.nombre ?? r.clienteId,
+      r.red,
+      r.marca,
+      r.categoria ?? '',
+      r.tipoPauta ?? '',
+      r.alcances ?? '',
+      r.interacciones ?? '',
+      r.link,
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `registros-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const filtered = useMemo(() => {
     let rs = registros.filter(r =>
       (!filtroCliente  || r.clienteId  === filtroCliente) &&
@@ -235,7 +259,11 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <button onClick={exportCSV}
+          className="text-[10px] font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">
+          ↓ Exportar CSV ({filtered.length})
+        </button>
         <button onClick={() => setShowForm(true)}
           className="text-[10px] font-medium px-3 py-1.5 rounded-lg bg-black text-white hover:bg-black/80 transition-colors">
           + Nuevo registro
