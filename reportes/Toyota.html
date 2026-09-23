@@ -1,0 +1,1126 @@
+<title>Toyota Media Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+:root {
+  --bg:        #0f1117;
+  --surface:   #1a1d27;
+  --surface2:  #222535;
+  --border:    #2d3147;
+  --text:      #e2e8f0;
+  --muted:     #94a3b8;
+  --faint:     #4a5568;
+  --blue:      #3b82f6;
+  --blue-dim:  #1d3a6e;
+  --green:     #10b981;
+  --green-dim: #0d3d30;
+  --red:       #eb0a1e;
+  --red-dim:   #3d0a10;
+  --warn:      #f59e0b;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:        #f0f2f7;
+    --surface:   #ffffff;
+    --surface2:  #f8f9fc;
+    --border:    #e2e6f0;
+    --text:      #1a1d27;
+    --muted:     #4a5568;
+    --faint:     #9aa3b8;
+    --blue-dim:  #dbeafe;
+    --green-dim: #d1fae5;
+    --red-dim:   #fee2e2;
+    color-scheme: light;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #0f1117;
+  --surface:   #1a1d27;
+  --surface2:  #222535;
+  --border:    #2d3147;
+  --text:      #e2e8f0;
+  --muted:     #94a3b8;
+  --faint:     #4a5568;
+  --blue-dim:  #1d3a6e;
+  --green-dim: #0d3d30;
+  --red-dim:   #3d0a10;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding-inline: 0;
+  padding-block: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+}
+
+/* ─── HEADER ─────────────────────────────────────────────── */
+.header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 56px;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.toyota-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toyota-wordmark {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--red);
+  text-transform: uppercase;
+}
+.header-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+}
+.header-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: background 0.3s;
+}
+.pulse-dot.loading { background: var(--warn); animation: pulse 1s infinite; }
+.pulse-dot.live    { background: var(--green); }
+.pulse-dot.error   { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ─── MAIN LAYOUT ─────────────────────────────────────────── */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 24px;
+}
+@media (max-width: 600px) {
+  .main { padding: 16px 16px; }
+  .header { padding: 0 16px; }
+}
+
+/* ─── KPI CARDS ───────────────────────────────────────────── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 700px) { .kpi-row { grid-template-columns: 1fr; } }
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.kpi-card.kpi-registros::before { background: var(--red); }
+.kpi-card.kpi-alcance::before   { background: var(--blue); }
+.kpi-card.kpi-inter::before     { background: var(--green); }
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 36px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.kpi-card.kpi-registros .kpi-value { color: var(--red); }
+.kpi-card.kpi-alcance .kpi-value   { color: var(--blue); }
+.kpi-card.kpi-inter .kpi-value     { color: var(--green); }
+.kpi-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ─── FILTERS ─────────────────────────────────────────────── */
+.filters-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 140px;
+}
+.filter-group.wide { min-width: 180px; }
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.filter-input, .filter-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  height: 34px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.filter-input:focus, .filter-select:focus {
+  border-color: var(--blue);
+}
+.filter-select { cursor: pointer; }
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-red     { background: var(--red); color: #fff; }
+.btn:hover   { opacity: 0.85; }
+
+/* ─── TABLE ───────────────────────────────────────────────── */
+.table-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.table-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.table-count {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead th {
+  background: var(--surface2);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td {
+  padding: 11px 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.td-fecha { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.td-proyecto { font-weight: 600; max-width: 200px; white-space: normal; line-height: 1.3; }
+.td-red { }
+.td-marca { color: var(--muted); }
+.td-tipo { }
+.td-alcance {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--blue);
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+.td-inter {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--green);
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+.td-link a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  display: inline-block;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+.td-link a:hover { color: var(--blue); text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge-yt    { background: #450a0a; color: #fca5a5; }
+.badge-ig    { background: #2d1442; color: #d8b4fe; }
+.badge-fb    { background: #1e3a5f; color: #93c5fd; }
+.badge-tt    { background: #0a2e1a; color: #6ee7b7; }
+.badge-tw    { background: #0a2233; color: #7dd3fc; }
+.badge-other { background: var(--surface2); color: var(--muted); }
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+.empty-icon { font-size: 32px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; }
+
+/* ─── PREVIEWS ────────────────────────────────────────────── */
+.previews-section {
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.previews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.preview-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: var(--text);
+}
+.preview-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+.preview-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+  background: var(--surface2);
+}
+.preview-thumb.vertical {
+  aspect-ratio: 9/16;
+  max-height: 280px;
+}
+.preview-thumb-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--faint);
+  font-size: 28px;
+}
+.preview-info {
+  padding: 10px 12px;
+}
+.preview-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.preview-red { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.preview-stats {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-family: 'JetBrains Mono', monospace;
+}
+.preview-reach { color: var(--blue); }
+.preview-inter { color: var(--green); }
+.preview-title {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── LOADING STATE ───────────────────────────────────────── */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  gap: 16px;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--muted); font-size: 14px; }
+
+/* ─── CSV MODAL ───────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-weight: 600; font-size: 14px; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+.csv-area {
+  width: 100%;
+  height: 240px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 10px;
+  resize: vertical;
+  outline: none;
+}
+.modal-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.copy-feedback { font-size: 12px; color: var(--green); align-self: center; margin-right: auto; opacity: 0; transition: opacity 0.3s; }
+.copy-feedback.show { opacity: 1; }
+
+/* ─── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+</style>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="toyota-logo">
+      <svg width="32" height="22" viewBox="0 0 32 22" fill="none" aria-hidden="true">
+        <ellipse cx="16" cy="11" rx="15" ry="10" fill="none" stroke="#eb0a1e" stroke-width="2"/>
+        <ellipse cx="16" cy="11" rx="7" ry="10" fill="none" stroke="#eb0a1e" stroke-width="2"/>
+        <line x1="3" y1="7" x2="29" y2="7" stroke="#eb0a1e" stroke-width="2"/>
+      </svg>
+      <span class="toyota-wordmark">Toyota</span>
+    </div>
+    <div class="header-sep"></div>
+    <span class="header-subtitle">Media Dashboard</span>
+  </div>
+  <div class="header-right">
+    <div id="status-pill">
+      <div class="pulse-dot loading" id="status-dot"></div>
+      <span id="status-text">Cargando…</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main" id="app">
+  <div class="loading-overlay" id="loading-view">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-msg">Obteniendo registros…</div>
+  </div>
+
+  <div id="content-view" hidden>
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card kpi-registros">
+        <div class="kpi-label">Registros</div>
+        <div class="kpi-value" id="kpi-registros">—</div>
+        <div class="kpi-sub" id="kpi-registros-sub">total</div>
+      </div>
+      <div class="kpi-card kpi-alcance">
+        <div class="kpi-label">Alcance Total</div>
+        <div class="kpi-value" id="kpi-alcance">—</div>
+        <div class="kpi-sub" id="kpi-alcance-sub">impresiones</div>
+      </div>
+      <div class="kpi-card kpi-inter">
+        <div class="kpi-label">Interacciones</div>
+        <div class="kpi-value" id="kpi-inter">—</div>
+        <div class="kpi-sub" id="kpi-inter-sub">engagements</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <div class="filter-label">Desde</div>
+        <input type="date" class="filter-input" id="f-from">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Hasta</div>
+        <input type="date" class="filter-input" id="f-to">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Red</div>
+        <select class="filter-select" id="f-red">
+          <option value="">Todas las redes</option>
+        </select>
+      </div>
+      <div class="filter-group wide">
+        <div class="filter-label">Proyecto / Producto</div>
+        <select class="filter-select" id="f-producto">
+          <option value="">Todos los proyectos</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-ghost" id="btn-clear">Limpiar</button>
+        <button class="btn btn-red" id="btn-export">↓ Exportar CSV</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+      <div class="table-header">
+        <div>
+          <span class="table-title">Registros filtrados</span>
+          &nbsp;<span class="table-count" id="table-count"></span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Proyecto</th>
+              <th>Red</th>
+              <th>Marca</th>
+              <th>Tipo de Pauta</th>
+              <th style="text-align:right">Alcance</th>
+              <th style="text-align:right">Interacciones</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <div class="empty-state" id="table-empty" hidden>
+          <div class="empty-icon">🔍</div>
+          <div class="empty-text">No hay registros para los filtros seleccionados</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEWS -->
+    <div class="previews-section" id="previews-section">
+      <div class="section-title">Previews de contenido</div>
+      <div class="previews-grid" id="previews-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CSV MODAL -->
+<div class="modal-backdrop" id="csv-modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Exportar CSV</span>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea class="csv-area" id="csv-area" readonly spellcheck="false"></textarea>
+    </div>
+    <div class="modal-foot">
+      <span class="copy-feedback" id="copy-feedback">¡Copiado al portapapeles!</span>
+      <button class="btn btn-ghost" id="btn-copy-csv">Copiar CSV</button>
+      <button class="btn btn-ghost" id="modal-cancel-btn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── CONFIG ──────────────────────────────────────────────────
+  const PROJECT    = 'ai-studio-applet-webapp-cd3f7';
+  const DATABASE   = 'controlregistroseg';
+  const API_KEY    = 'AIzaSyBkWMHpO0TqhNKH0jzcTIPlSAxpG4m__S0';
+  const CLIENT_ID  = 'bsd4GNwp8ceIUT8FWD5T';
+  const BASE_URL   = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/${DATABASE}/documents`;
+
+  // ── STATE ────────────────────────────────────────────────────
+  let allRegistros = [];   // raw joined rows {id, fecha, red, marca, tipoPauta, link, categoria, notas, productoId, productoNombre, alcance, interacciones}
+  let filtered     = [];
+
+  // ── UTILS ────────────────────────────────────────────────────
+  function fv(v) {
+    if (!v) return '';
+    if (v.stringValue  !== undefined) return v.stringValue;
+    if (v.integerValue !== undefined) return String(v.integerValue);
+    if (v.doubleValue  !== undefined) return String(v.doubleValue);
+    if (v.booleanValue !== undefined) return String(v.booleanValue);
+    if (v.timestampValue !== undefined) return v.timestampValue;
+    return '';
+  }
+
+  function docId(name) {
+    return name.split('/').pop();
+  }
+
+  function fmt(n) {
+    if (n === null || n === undefined || n === '' || isNaN(n)) return '—';
+    return Number(n).toLocaleString('es-GT');
+  }
+
+  function normYtId(url) {
+    if (!url) return null;
+    // youtu.be/ID
+    let m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
+    if (m) return m[1];
+    // /shorts/ID or /live/ID
+    m = url.match(/\/(?:shorts|live)\/([A-Za-z0-9_\-]+)/);
+    if (m) return m[1];
+    // ?v=ID or &v=ID
+    m = url.match(/[?&]v=([A-Za-z0-9_\-]+)/);
+    if (m) return m[1];
+    return null;
+  }
+
+  function isYouTube(url) {
+    return /youtube\.com|youtu\.be/.test(url || '');
+  }
+
+  function isYtShort(url) {
+    return /\/shorts\/|\/live\//.test(url || '');
+  }
+
+  function isInstagram(url) {
+    return /instagram\.com/.test(url || '');
+  }
+
+  function isTikTok(url) {
+    return /tiktok\.com/.test(url || '');
+  }
+
+  function isFacebook(url) {
+    return /facebook\.com|fb\.com/.test(url || '');
+  }
+
+  function normLink(url) {
+    if (!url) return url;
+    const ytId = normYtId(url);
+    if (ytId) return 'yt:' + ytId;
+    return url.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+  }
+
+  function redBadge(red) {
+    const r = (red || '').toLowerCase();
+    if (r.includes('youtube') || r === 'yt') return `<span class="badge badge-yt">${red}</span>`;
+    if (r.includes('instagram') || r === 'ig') return `<span class="badge badge-ig">${red}</span>`;
+    if (r.includes('facebook') || r === 'fb') return `<span class="badge badge-fb">${red}</span>`;
+    if (r.includes('tiktok') || r === 'tt') return `<span class="badge badge-tt">${red}</span>`;
+    if (r.includes('twitter') || r.includes('x.com')) return `<span class="badge badge-tw">${red}</span>`;
+    return `<span class="badge badge-other">${red || '—'}</span>`;
+  }
+
+  function truncLink(url, max = 40) {
+    if (!url) return '—';
+    try {
+      const u = new URL(url);
+      const short = u.hostname.replace('www.', '') + u.pathname;
+      return short.length > max ? short.slice(0, max) + '…' : short;
+    } catch { return url.length > max ? url.slice(0, max) + '…' : url; }
+  }
+
+  // ── FETCH HELPERS ────────────────────────────────────────────
+  async function fetchAllDocs(collection) {
+    const docs = [];
+    let pageToken = null;
+    do {
+      const url = `${BASE_URL}/${collection}?pageSize=500&key=${API_KEY}${pageToken ? '&pageToken=' + pageToken : ''}`;
+      const res  = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${collection}`);
+      const json = await res.json();
+      if (json.documents) docs.push(...json.documents);
+      pageToken = json.nextPageToken || null;
+    } while (pageToken);
+    return docs;
+  }
+
+  async function queryRegistros() {
+    const url  = `${BASE_URL}:runQuery?key=${API_KEY}`;
+    const body = {
+      structuredQuery: {
+        from: [{ collectionId: 'registros' }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: 'clienteId' },
+            op: 'EQUAL',
+            value: { stringValue: CLIENT_ID }
+          }
+        },
+        limit: 1000
+      }
+    };
+    const res  = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(`HTTP ${res.status} running query`);
+    const results = await res.json();
+    return results.filter(r => r.document).map(r => r.document);
+  }
+
+  // ── MAIN FETCH & JOIN ────────────────────────────────────────
+  async function loadData() {
+    setStatus('loading', 'Cargando registros…');
+    setMsg('Obteniendo registros de Toyota…');
+
+    const [regDocs, metDocs, prodDocs] = await Promise.all([
+      queryRegistros(),
+      fetchAllDocs('metricas'),
+      fetchAllDocs('productos')
+    ]);
+
+    setMsg('Cruzando métricas…');
+
+    // Build producto map
+    const prodMap = {};
+    for (const d of prodDocs) {
+      const id   = docId(d.name);
+      const f    = d.fields || {};
+      prodMap[id] = { nombre: fv(f.nombre), color: fv(f.color) };
+    }
+
+    // Build metricas map: registroId → max alcance/inter
+    const metMap = {};
+    for (const d of metDocs) {
+      const f   = d.fields || {};
+      const rid = fv(f.registroId);
+      if (!rid) continue;
+      const alc = parseInt(fv(f.alcances) || 0, 10) || 0;
+      const int = parseInt(fv(f.interacciones) || 0, 10) || 0;
+      if (!metMap[rid] || alc > metMap[rid].alcance) {
+        metMap[rid] = { alcance: alc, interacciones: int };
+      }
+    }
+
+    // Build normLink → max alcance/inter (for dedup by link)
+    const linkMetMap = {};
+    for (const d of regDocs) {
+      const id  = docId(d.name);
+      const f   = d.fields || {};
+      const lnk = fv(f.link);
+      const nl  = normLink(lnk);
+      const met = metMap[id] || { alcance: 0, interacciones: 0 };
+      if (!linkMetMap[nl] || met.alcance > (linkMetMap[nl] || {}).alcance) {
+        linkMetMap[nl] = met;
+      }
+    }
+
+    // Join
+    allRegistros = regDocs.map(d => {
+      const id  = docId(d.name);
+      const f   = d.fields || {};
+      const pid = fv(f.productoId);
+      const lnk = fv(f.link);
+      const nl  = normLink(lnk);
+      const met = metMap[id] || linkMetMap[nl] || { alcance: 0, interacciones: 0 };
+      return {
+        id,
+        fecha:        fv(f.fecha),
+        red:          fv(f.red),
+        marca:        fv(f.marca),
+        tipoPauta:    fv(f.tipoPauta),
+        link:         lnk,
+        normLink:     nl,
+        categoria:    fv(f.categoria),
+        notas:        fv(f.notas),
+        productoId:   pid,
+        productoNombre: prodMap[pid]?.nombre || pid || '—',
+        alcance:      met.alcance,
+        interacciones: met.interacciones
+      };
+    });
+
+    // Sort by fecha desc
+    allRegistros.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+    populateFilters();
+    applyFilters();
+
+    document.getElementById('loading-view').hidden = true;
+    document.getElementById('content-view').hidden = false;
+    setStatus('live', `${allRegistros.length} registros`);
+  }
+
+  // ── FILTER CONTROLS ──────────────────────────────────────────
+  function populateFilters() {
+    const reds  = [...new Set(allRegistros.map(r => r.red).filter(Boolean))].sort();
+    const prods = [...new Set(allRegistros.map(r => r.productoNombre).filter(Boolean))].sort();
+
+    const selRed  = document.getElementById('f-red');
+    const selProd = document.getElementById('f-producto');
+
+    reds.forEach(r  => { const o = document.createElement('option'); o.value = r; o.textContent = r; selRed.appendChild(o); });
+    prods.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; selProd.appendChild(o); });
+
+    const dates = allRegistros.map(r => r.fecha).filter(Boolean).sort();
+    if (dates.length) {
+      document.getElementById('f-from').value = dates[0];
+      document.getElementById('f-to').value   = dates[dates.length - 1];
+    }
+  }
+
+  function applyFilters() {
+    const from = document.getElementById('f-from').value;
+    const to   = document.getElementById('f-to').value;
+    const red  = document.getElementById('f-red').value;
+    const prod = document.getElementById('f-producto').value;
+
+    filtered = allRegistros.filter(r => {
+      if (from && r.fecha && r.fecha < from) return false;
+      if (to   && r.fecha && r.fecha > to)   return false;
+      if (red  && r.red !== red)              return false;
+      if (prod && r.productoNombre !== prod)  return false;
+      return true;
+    });
+
+    renderKPIs();
+    renderTable();
+    renderPreviews();
+  }
+
+  // ── KPIs ─────────────────────────────────────────────────────
+  function renderKPIs() {
+    const totalAlc = filtered.reduce((s, r) => s + (r.alcance || 0), 0);
+    const totalInt = filtered.reduce((s, r) => s + (r.interacciones || 0), 0);
+
+    document.getElementById('kpi-registros').textContent = fmt(filtered.length);
+    document.getElementById('kpi-alcance').textContent   = fmt(totalAlc);
+    document.getElementById('kpi-inter').textContent     = fmt(totalInt);
+    document.getElementById('kpi-registros-sub').textContent = filtered.length !== allRegistros.length ? `de ${fmt(allRegistros.length)} totales` : 'total';
+  }
+
+  // ── TABLE ─────────────────────────────────────────────────────
+  function renderTable() {
+    const tbody = document.getElementById('table-body');
+    const empty = document.getElementById('table-empty');
+    const count = document.getElementById('table-count');
+
+    count.textContent = `${fmt(filtered.length)} resultado${filtered.length !== 1 ? 's' : ''}`;
+
+    if (!filtered.length) {
+      tbody.innerHTML = '';
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+
+    tbody.innerHTML = filtered.map(r => `
+      <tr>
+        <td class="td-fecha">${r.fecha || '—'}</td>
+        <td class="td-proyecto">${escHtml(r.productoNombre)}</td>
+        <td class="td-red">${redBadge(r.red)}</td>
+        <td class="td-marca">${escHtml(r.marca) || '—'}</td>
+        <td class="td-tipo">${escHtml(r.tipoPauta) || '—'}</td>
+        <td class="td-alcance">${fmt(r.alcance)}</td>
+        <td class="td-inter">${fmt(r.interacciones)}</td>
+        <td class="td-link">${r.link ? `<a href="${escHtml(r.link)}" target="_blank" rel="noopener" title="${escHtml(r.link)}">${escHtml(truncLink(r.link))}</a>` : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── PREVIEWS ─────────────────────────────────────────────────
+  function renderPreviews() {
+    const grid = document.getElementById('previews-grid');
+    const section = document.getElementById('previews-section');
+
+    // Deduplicate by normLink, take first 9
+    const seen = new Set();
+    const items = [];
+    for (const r of filtered) {
+      if (items.length >= 9) break;
+      if (!r.link) continue;
+      const nl = r.normLink;
+      if (seen.has(nl)) continue;
+      seen.add(nl);
+      items.push(r);
+    }
+
+    if (!items.length) {
+      section.hidden = true;
+      return;
+    }
+    section.hidden = false;
+
+    grid.innerHTML = items.map(r => {
+      const url  = r.link;
+      const ytId = normYtId(url);
+      const short = isYtShort(url);
+
+      let thumbHtml = '';
+      if (ytId) {
+        const thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        thumbHtml = `<img class="preview-thumb${short ? ' vertical' : ''}" src="${thumb}" alt="YouTube thumbnail" loading="lazy" onerror="this.style.display='none'">`;
+      } else if (isInstagram(url)) {
+        thumbHtml = `<div class="preview-thumb-placeholder" style="aspect-ratio:${isYtShort(url)?'9/16':'16/9'}">📸</div>`;
+      } else if (isTikTok(url)) {
+        thumbHtml = `<div class="preview-thumb-placeholder" style="aspect-ratio:9/16">🎵</div>`;
+      } else if (isFacebook(url)) {
+        thumbHtml = `<div class="preview-thumb-placeholder">👥</div>`;
+      } else {
+        thumbHtml = `<div class="preview-thumb-placeholder">🔗</div>`;
+      }
+
+      return `
+        <a class="preview-card" href="${escHtml(url)}" target="_blank" rel="noopener">
+          ${thumbHtml}
+          <div class="preview-info">
+            <div class="preview-meta">
+              <span class="preview-red">${escHtml(r.red) || '—'}</span>
+              <div class="preview-stats">
+                <span class="preview-reach">↗ ${fmt(r.alcance)}</span>
+                <span class="preview-inter">♥ ${fmt(r.interacciones)}</span>
+              </div>
+            </div>
+            <div class="preview-title">${escHtml(truncLink(url, 48))}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  // ── CSV EXPORT ───────────────────────────────────────────────
+  function buildCsv() {
+    const header = ['Fecha', 'Proyecto', 'Red', 'Marca', 'Tipo de Pauta', 'Alcance', 'Interacciones', 'Link', 'Categoria', 'Notas'].join(',');
+    const rows   = filtered.map(r => [
+      r.fecha, r.productoNombre, r.red, r.marca, r.tipoPauta,
+      r.alcance, r.interacciones, r.link, r.categoria, r.notas
+    ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
+    return [header, ...rows].join('\r\n');
+  }
+
+  // ── STATUS ───────────────────────────────────────────────────
+  function setStatus(state, text) {
+    const dot  = document.getElementById('status-dot');
+    const span = document.getElementById('status-text');
+    dot.className  = 'pulse-dot ' + state;
+    span.textContent = text;
+  }
+
+  function setMsg(txt) {
+    document.getElementById('loading-msg').textContent = txt;
+  }
+
+  function escHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── EVENTS ───────────────────────────────────────────────────
+  ['f-from','f-to','f-red','f-producto'].forEach(id => {
+    document.getElementById(id).addEventListener('change', applyFilters);
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    document.getElementById('f-red').value      = '';
+    document.getElementById('f-producto').value = '';
+    const dates = allRegistros.map(r => r.fecha).filter(Boolean).sort();
+    if (dates.length) {
+      document.getElementById('f-from').value = dates[0];
+      document.getElementById('f-to').value   = dates[dates.length - 1];
+    }
+    applyFilters();
+  });
+
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const csv = buildCsv();
+    document.getElementById('csv-area').value = csv;
+    document.getElementById('csv-modal').hidden = false;
+    document.getElementById('copy-feedback').classList.remove('show');
+  });
+
+  function closeModal() { document.getElementById('csv-modal').hidden = true; }
+  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
+  document.getElementById('csv-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+  document.getElementById('btn-copy-csv').addEventListener('click', () => {
+    const area = document.getElementById('csv-area');
+    const fb   = document.getElementById('copy-feedback');
+    navigator.clipboard.writeText(area.value).then(() => {
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2500);
+    }).catch(() => {
+      area.select();
+      try { document.execCommand('copy'); fb.classList.add('show'); setTimeout(() => fb.classList.remove('show'), 2500); } catch(_) {}
+    });
+  });
+
+  // ── INIT ─────────────────────────────────────────────────────
+  loadData().catch(err => {
+    console.error(err);
+    setStatus('error', 'Error al cargar');
+    document.getElementById('loading-view').innerHTML = `
+      <div style="text-align:center;padding:48px 24px;color:var(--muted)">
+        <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+        <div style="font-size:14px;margin-bottom:8px">Error al cargar datos</div>
+        <div style="font-size:12px;color:var(--faint)">${escHtml(err.message)}</div>
+        <button class="btn btn-ghost" style="margin-top:16px" onclick="location.reload()">Reintentar</button>
+      </div>
+    `;
+  });
+})();
+</script>

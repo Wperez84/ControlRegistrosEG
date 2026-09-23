@@ -3,6 +3,12 @@
   "hosting": {
     "site": "controlregistroseg", "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    "rewrites": [
+      { "source": "/reportes/Agricola", "destination": "/reportes/Agricola.html" },
+      { "source": "/reportes/DISAL",    "destination": "/reportes/DISAL.html" },
+      { "source": "/reportes/ELF",      "destination": "/reportes/ELF.html" },
+      { "source": "/reportes/Toyota",   "destination": "/reportes/Toyota.html" },
+      { "source": "**", "destination": "/index.html" }
+    ]
   }
 }

@@ -1,0 +1,834 @@
+<title>ELF Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+
+<style>
+  /* ── Tokens ── */
+  :root {
+    color-scheme: dark;
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --surface2:  #222637;
+    --border:    #2a2f45;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --accent:    #3b82f6;
+    --accent-lo: rgba(59,130,246,.12);
+    --green:     #10b981;
+    --green-lo:  rgba(16,185,129,.12);
+    --elf:       #f97316;
+    --elf-lo:    rgba(249,115,22,.15);
+    --red:       #ef4444;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  /* This dashboard is intentionally dark-only; still paint the body */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding-inline: 20px;
+    padding-block: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; }
+  button { cursor: pointer; font: inherit; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Layout ── */
+  .page { max-width: 1400px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .client-badge {
+    background: var(--elf-lo);
+    border: 1px solid var(--elf);
+    color: var(--elf);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .08em;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  #last-updated { font-size: 12px; color: var(--muted); }
+
+  /* ── Loading ── */
+  #loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 80px 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── KPI cards ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .kpi-value.blue { color: var(--accent); }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.elf  { color: var(--elf); }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── Filters ── */
+  .filters {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 24px;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; }
+  .filter-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .filter-group input,
+  .filter-group select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    height: 34px;
+  }
+  .filter-group input:focus,
+  .filter-group select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .filter-group select { min-width: 160px; }
+  .filter-group input[type=date] { min-width: 140px; color-scheme: dark; }
+  .btn {
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    transition: background .15s, border-color .15s;
+    align-self: flex-end;
+  }
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+  }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── Section heading ── */
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #result-count { font-size: 13px; color: var(--muted); }
+
+  /* ── Table ── */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 32px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  thead th {
+    background: var(--surface);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td {
+    padding: 10px 14px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .td-num { color: var(--accent); font-weight: 600; }
+  .td-green { color: var(--green); font-weight: 600; }
+  .td-muted { color: var(--muted); }
+  .td-link a {
+    color: var(--accent);
+    font-size: 12px;
+    max-width: 180px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .no-data {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+  }
+
+  /* ── Preview grid ── */
+  #previews-section { margin-bottom: 40px; }
+  .previews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .preview-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .preview-meta {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .preview-meta a { color: var(--accent); font-size: 11px; }
+  .embed-wrap { position: relative; width: 100%; background: #000; }
+  .embed-wrap.horizontal { aspect-ratio: 16/9; }
+  .embed-wrap.vertical {
+    height: 70vh;
+    max-height: 600px;
+    width: calc(min(70vh, 600px) * 9/16);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .embed-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .preview-placeholder {
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--muted);
+    background: var(--surface2);
+    font-size: 12px;
+  }
+  .preview-placeholder svg { opacity: .4; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    body { padding-inline: 14px; }
+    .kpi-value { font-size: 22px; }
+    .filters { padding: 14px; }
+    .embed-wrap.vertical { height: 50vh; width: calc(50vh * 9/16); }
+    .header h1 { font-size: 16px; }
+  }
+</style>
+
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <span class="client-badge">ELF</span>
+      <div>
+        <h1>Dashboard de Publicaciones</h1>
+        <div class="header-sub">Registro editorial consolidado · Todas las redes</div>
+      </div>
+    </div>
+    <div id="last-updated"></div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading-state">
+    <div class="spinner"></div>
+    <span>Cargando datos…</span>
+  </div>
+
+  <!-- Main content (hidden until loaded) -->
+  <div id="main-content" hidden>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Total Registros</div>
+        <div class="kpi-value elf" id="kpi-total">—</div>
+        <div class="kpi-sub">publicaciones registradas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Alcance Total</div>
+        <div class="kpi-value blue" id="kpi-alcance">—</div>
+        <div class="kpi-sub">suma de alcances</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Interacciones</div>
+        <div class="kpi-value green" id="kpi-inter">—</div>
+        <div class="kpi-sub">suma de interacciones</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Redes cubiertas</div>
+        <div class="kpi-value elf" id="kpi-redes">—</div>
+        <div class="kpi-sub">plataformas distintas</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Desde</label>
+        <input type="date" id="f-from">
+      </div>
+      <div class="filter-group">
+        <label>Hasta</label>
+        <input type="date" id="f-to">
+      </div>
+      <div class="filter-group">
+        <label>Red</label>
+        <select id="f-red"><option value="">Todas las redes</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Proyecto / Producto</label>
+        <select id="f-producto"><option value="">Todos los productos</option></select>
+      </div>
+      <button class="btn btn-ghost" onclick="clearFilters()">Limpiar</button>
+      <button class="btn btn-primary" onclick="exportCSV()">⬇ Exportar CSV</button>
+    </div>
+
+    <!-- Table -->
+    <div class="section-head">
+      <span class="section-title">Registros</span>
+      <span id="result-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Proyecto</th>
+            <th>Red</th>
+            <th>Marca</th>
+            <th>Tipo de Pauta</th>
+            <th>Alcance</th>
+            <th>Interacciones</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Previews -->
+    <div id="previews-section">
+      <div class="section-head">
+        <span class="section-title">Previews de Contenido</span>
+        <span id="preview-count" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div class="previews-grid" id="previews-grid"></div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /page -->
+
+<script>
+// ── Config ─────────────────────────────────────────────────────────
+const API_KEY   = 'AIzaSyBkWMHpO0TqhNKH0jzcTIPlSAxpG4m__S0';
+const PROJECT   = 'ai-studio-applet-webapp-cd3f7';
+const DATABASE  = 'controlregistroseg';
+const CLIENT_ID = 'YhKDtMKXlRLABYI2nqEZ';
+
+const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/${DATABASE}/documents`;
+
+// ── State ───────────────────────────────────────────────────────────
+let allRegistros  = []; // enriched with metricas + producto nombre
+let filteredRows  = [];
+
+// ── Firestore helpers ───────────────────────────────────────────────
+function getField(f) {
+  if (!f) return null;
+  if (f.stringValue  !== undefined) return f.stringValue;
+  if (f.integerValue !== undefined) return Number(f.integerValue);
+  if (f.doubleValue  !== undefined) return Number(f.doubleValue);
+  if (f.booleanValue !== undefined) return f.booleanValue;
+  if (f.nullValue    !== undefined) return null;
+  return null;
+}
+function docToObj(doc) {
+  if (!doc || !doc.fields) return null;
+  const obj = { _id: doc.name ? doc.name.split('/').pop() : null };
+  for (const [k, v] of Object.entries(doc.fields)) {
+    obj[k] = getField(v);
+  }
+  return obj;
+}
+
+async function fetchAllDocs(collection) {
+  let docs = [], pageToken = null;
+  do {
+    let url = `${BASE}/${collection}?pageSize=500&key=${API_KEY}`;
+    if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error(`Firestore ${collection}: HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.documents) docs.push(...data.documents.map(docToObj).filter(Boolean));
+    pageToken = data.nextPageToken || null;
+  } while (pageToken);
+  return docs;
+}
+
+async function queryRegistros() {
+  // POST runQuery to filter by clienteId
+  let docs = [], pageToken = null;
+  do {
+    let url = `${BASE}:runQuery?key=${API_KEY}`;
+    if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+    const body = {
+      structuredQuery: {
+        from: [{ collectionId: 'registros' }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: 'clienteId' },
+            op: 'EQUAL',
+            value: { stringValue: CLIENT_ID }
+          }
+        },
+        orderBy: [{ field: { fieldPath: 'fecha' }, direction: 'DESCENDING' }]
+      }
+    };
+    const res  = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(`runQuery registros: HTTP ${res.status}`);
+    const data = await res.json();
+    for (const item of data) {
+      if (item.document) docs.push(docToObj(item.document));
+    }
+    pageToken = (data[data.length - 1] || {}).nextPageToken || null;
+  } while (pageToken);
+  return docs.filter(Boolean);
+}
+
+// ── normLink ────────────────────────────────────────────────────────
+function extractYtId(url) {
+  if (!url) return null;
+  const patterns = [
+    /[?&]v=([A-Za-z0-9_-]+)/,
+    /\/shorts\/([A-Za-z0-9_-]+)/,
+    /\/live\/([A-Za-z0-9_-]+)/,
+    /youtu\.be\/([A-Za-z0-9_-]+)/,
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1]; // preserve case
+  }
+  return null;
+}
+function isYtShorts(url) { return /\/shorts\//i.test(url || ''); }
+function isYtLive(url)   { return /\/live\//i.test(url || ''); }
+function isYt(url)       { return /youtu(be\.com|\.be)/i.test(url || ''); }
+function isIg(url)       { return /instagram\.com/i.test(url || ''); }
+
+function normLink(url) {
+  if (!url) return '';
+  const ytId = extractYtId(url);
+  if (ytId) return 'yt:' + ytId;
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('instagram.com')) {
+      return u.origin + u.pathname.replace(/\/+$/, '');
+    }
+  } catch(e) {}
+  return url.replace(/\/+$/, '').toLowerCase();
+}
+
+// ── Load data ───────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    // Parallel fetches
+    const [registros, metricasDocs, productosDocs] = await Promise.all([
+      queryRegistros(),
+      fetchAllDocs('metricas'),
+      fetchAllDocs('productos'),
+    ]);
+
+    // Build lookup maps
+    // metricas: group by registroId, then by normLink → max(alcances), max(interacciones)
+    const metByReg = {};
+    for (const m of metricasDocs) {
+      const rid = m.registroId || m.registroid || null;
+      if (!rid) continue;
+      if (!metByReg[rid]) metByReg[rid] = { alcances: 0, interacciones: 0 };
+      metByReg[rid].alcances      = Math.max(metByReg[rid].alcances,      m.alcances      || 0);
+      metByReg[rid].interacciones = Math.max(metByReg[rid].interacciones, m.interacciones || 0);
+    }
+
+    // Also build normLink → max metrics map for dedup
+    // (registros might share the same link)
+    const metByLink = {};
+    for (const m of metricasDocs) {
+      const rid = m.registroId || m.registroid || null;
+      if (!rid) continue;
+      // find registros that have this rid as their _id
+      // We'll do this after merging below
+    }
+
+    const prodMap = {};
+    for (const p of productosDocs) {
+      prodMap[p._id] = p;
+    }
+
+    // Enrich registros
+    allRegistros = registros.map(r => {
+      const met    = metByReg[r._id] || { alcances: 0, interacciones: 0 };
+      const prod   = prodMap[r.productoId] || null;
+      return {
+        ...r,
+        productoNombre: prod ? prod.nombre : (r.productoId || '—'),
+        productoColor:  prod ? prod.color  : null,
+        alcances:       met.alcances,
+        interacciones:  met.interacciones,
+        _norm:          normLink(r.link),
+      };
+    });
+
+    // Second pass: max by normLink across all registros (same link may appear multiple times)
+    const nlMax = {};
+    for (const r of allRegistros) {
+      if (!r._norm) continue;
+      if (!nlMax[r._norm]) nlMax[r._norm] = { alcances: 0, interacciones: 0 };
+      nlMax[r._norm].alcances      = Math.max(nlMax[r._norm].alcances,      r.alcances);
+      nlMax[r._norm].interacciones = Math.max(nlMax[r._norm].interacciones, r.interacciones);
+    }
+    for (const r of allRegistros) {
+      if (r._norm && nlMax[r._norm]) {
+        r.alcances      = nlMax[r._norm].alcances;
+        r.interacciones = nlMax[r._norm].interacciones;
+      }
+    }
+
+    // Populate filter dropdowns
+    const redes     = [...new Set(allRegistros.map(r => r.red).filter(Boolean))].sort();
+    const productos = [...new Set(allRegistros.map(r => r.productoNombre).filter(Boolean))].sort();
+    const selRed  = document.getElementById('f-red');
+    const selProd = document.getElementById('f-producto');
+    for (const v of redes)     { const o = document.createElement('option'); o.value = v; o.textContent = v; selRed.appendChild(o); }
+    for (const v of productos) { const o = document.createElement('option'); o.value = v; o.textContent = v; selProd.appendChild(o); }
+
+    // Add change listeners
+    ['f-from','f-to','f-red','f-producto'].forEach(id => {
+      document.getElementById(id).addEventListener('change', applyFilters);
+    });
+
+    // Show
+    document.getElementById('loading-state').hidden = true;
+    document.getElementById('main-content').hidden  = false;
+    document.getElementById('last-updated').textContent =
+      'Actualizado ' + new Date().toLocaleString('es-GT', { dateStyle:'medium', timeStyle:'short' });
+
+    applyFilters();
+  } catch(err) {
+    document.getElementById('loading-state').innerHTML =
+      `<div style="color:var(--red);text-align:center">
+        <strong>Error cargando datos</strong><br>
+        <span style="font-size:12px;color:var(--muted)">${err.message}</span>
+      </div>`;
+    console.error(err);
+  }
+}
+
+// ── Filters ─────────────────────────────────────────────────────────
+function applyFilters() {
+  const from    = document.getElementById('f-from').value;
+  const to      = document.getElementById('f-to').value;
+  const red     = document.getElementById('f-red').value;
+  const prod    = document.getElementById('f-producto').value;
+
+  filteredRows = allRegistros.filter(r => {
+    if (from && r.fecha && r.fecha < from) return false;
+    if (to   && r.fecha && r.fecha > to)   return false;
+    if (red  && r.red !== red)             return false;
+    if (prod && r.productoNombre !== prod) return false;
+    return true;
+  });
+
+  renderKPIs();
+  renderTable();
+  renderPreviews();
+}
+
+function clearFilters() {
+  ['f-from','f-to'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-red').value     = '';
+  document.getElementById('f-producto').value = '';
+  applyFilters();
+}
+
+// ── KPIs ─────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return Number(n).toLocaleString('es-GT');
+}
+function renderKPIs() {
+  const rows  = filteredRows;
+  const totalAlc  = rows.reduce((s, r) => s + (r.alcances || 0), 0);
+  const totalInt  = rows.reduce((s, r) => s + (r.interacciones || 0), 0);
+  const redes     = new Set(rows.map(r => r.red).filter(Boolean)).size;
+
+  document.getElementById('kpi-total').textContent   = fmt(rows.length);
+  document.getElementById('kpi-alcance').textContent = fmt(totalAlc);
+  document.getElementById('kpi-inter').textContent   = fmt(totalInt);
+  document.getElementById('kpi-redes').textContent   = redes || '—';
+}
+
+// ── Table ────────────────────────────────────────────────────────────
+function truncate(url, n=40) {
+  if (!url) return '—';
+  return url.length > n ? url.slice(0, n) + '…' : url;
+}
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  document.getElementById('result-count').textContent =
+    filteredRows.length + ' resultado' + (filteredRows.length !== 1 ? 's' : '');
+
+  if (!filteredRows.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="no-data">Sin resultados para los filtros seleccionados</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredRows.map(r => `
+    <tr>
+      <td class="td-muted">${r.fecha || '—'}</td>
+      <td>${escHtml(r.productoNombre || '—')}</td>
+      <td><span class="badge">${escHtml(r.red || '—')}</span></td>
+      <td>${escHtml(r.marca || '—')}</td>
+      <td><span class="badge">${escHtml(r.tipoPauta || '—')}</span></td>
+      <td class="td-num">${fmt(r.alcances)}</td>
+      <td class="td-green">${fmt(r.interacciones)}</td>
+      <td class="td-link">${r.link
+        ? `<a href="${escHtml(r.link)}" target="_blank" rel="noopener" title="${escHtml(r.link)}">${escHtml(truncate(r.link))}</a>`
+        : '<span class="td-muted">—</span>'
+      }</td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ── Previews ─────────────────────────────────────────────────────────
+function renderPreviews() {
+  const grid = document.getElementById('previews-grid');
+  const countEl = document.getElementById('preview-count');
+
+  // Only rows with a link
+  const withLink = filteredRows.filter(r => r.link);
+  // Dedup by normLink, take first 9
+  const seen = new Set();
+  const preview9 = [];
+  for (const r of withLink) {
+    if (!r._norm || seen.has(r._norm)) continue;
+    seen.add(r._norm);
+    preview9.push(r);
+    if (preview9.length >= 9) break;
+  }
+
+  countEl.textContent = preview9.length
+    ? `Mostrando ${preview9.length} de ${withLink.length} con link`
+    : '';
+
+  if (!preview9.length) {
+    grid.innerHTML = `<p style="color:var(--muted);font-size:13px">Sin links en el filtro actual.</p>`;
+    return;
+  }
+
+  grid.innerHTML = preview9.map(r => buildPreviewCard(r)).join('');
+}
+
+function buildPreviewCard(r) {
+  const url    = r.link;
+  const ytId   = extractYtId(url);
+  const shorts = isYtShorts(url);
+  const live   = isYtLive(url);
+  const ig     = isIg(url);
+
+  let embedHtml = '';
+  if (ytId) {
+    const ratio = (shorts || live) ? 'vertical' : 'horizontal';
+    embedHtml = `
+      <div class="embed-wrap ${ratio}">
+        <iframe src="https://www.youtube.com/embed/${escHtml(ytId)}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>`;
+  } else if (ig) {
+    // Instagram embeds require external script; show placeholder with link
+    embedHtml = `
+      <div class="preview-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Instagram</span>
+        <a href="${escHtml(url)}" target="_blank" rel="noopener" style="margin-top:4px">Abrir publicación ↗</a>
+      </div>`;
+  } else {
+    embedHtml = `
+      <div class="preview-placeholder">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <a href="${escHtml(url)}" target="_blank" rel="noopener">Abrir link ↗</a>
+      </div>`;
+  }
+
+  return `
+    <div class="preview-card">
+      ${embedHtml}
+      <div class="preview-meta">
+        <span>${escHtml(r.productoNombre || '—')} · ${escHtml(r.red || '—')}</span>
+        <a href="${escHtml(url)}" target="_blank" rel="noopener">↗</a>
+      </div>
+    </div>`;
+}
+
+// ── Export CSV ────────────────────────────────────────────────────────
+function exportCSV() {
+  const headers = ['Fecha','Proyecto','Red','Marca','TipoPauta','Alcance','Interacciones','Link','Notas'];
+  const rows = filteredRows.map(r => [
+    r.fecha, r.productoNombre, r.red, r.marca, r.tipoPauta,
+    r.alcances, r.interacciones, r.link, r.notas
+  ].map(v => {
+    const s = String(v ?? '');
+    return s.includes(',') || s.includes('"') || s.includes('\n')
+      ? `"${s.replace(/"/g,'""')}"` : s;
+  }));
+
+  const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url, download: `ELF-registros-${new Date().toISOString().slice(0,10)}.csv`
+  });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+loadData();
+</script>
