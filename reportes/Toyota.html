@@ -78,6 +78,11 @@ td a:hover { text-decoration: underline; }
 
 .empty { text-align: center; color: var(--muted); padding: 40px; }
 
+.grupo-logo { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+footer { background: var(--card); border-top: 1px solid var(--border); padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+footer .disclaimer { font-size: 11px; color: var(--muted); line-height: 1.5; }
+footer .disclaimer strong { color: var(--text); }
+
 @media(max-width:600px) {
   .kpi-val { font-size: 20px; }
   header h1 { font-size: 15px; }
@@ -92,8 +97,12 @@ td a:hover { text-decoration: underline; }
     <h1>Dashboard de Pauta</h1>
     <span class="sub">Datos estáticos generados el 2026-09-23</span>
   </div>
-  <div style="margin-left:auto;display:flex;gap:8px;">
-    <button class="btn btn-export" onclick="exportCSV()">Exportar CSV</button>
+  <button class="btn btn-export" onclick="exportCSV()" style="margin-left:auto;">Exportar CSV</button>
+  <div class="grupo-logo">
+    <svg viewBox="0 0 120 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="4" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#e8001c" letter-spacing="-1">GRUPO</text>
+      <text x="76" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#f1f5f9" letter-spacing="-1">LPG</text>
+    </svg>
   </div>
 </header>
 
@@ -291,5 +300,14 @@ function exportCSV(){
 ['fDesde','fHasta','fRed','fProyecto'].forEach(id=>document.getElementById(id).addEventListener('change',render));
 render();
 </script>
+
+<footer>
+  <div class="disclaimer">
+    <strong>Gerencia Comercial Digital — Grupo LPG</strong><br>
+    La información contenida en este reporte es de uso interno y exclusivo para la Gerencia Comercial Digital de Grupo La Prensa Gráfica.
+    Los datos reflejan el registro de pauta y métricas de alcance e interacciones proporcionados por las plataformas digitales.
+    No debe ser reproducida, distribuida ni compartida fuera del equipo autorizado.
+  </div>
+</footer>
 </body>
 </html>
