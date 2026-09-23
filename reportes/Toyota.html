@@ -195,8 +195,10 @@ function getFiltered(){
 function render(){
   const filtered = getFiltered();
   // KPIs
-  const totAlc = filtered.reduce((s,d)=>s+d.alcances,0);
-  const totInt = filtered.reduce((s,d)=>s+d.interacciones,0);
+  function ytId(link){if(!link)return null;const m=link.match(/[?&]v=([a-zA-Z0-9_-]{6,})/)||link.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/i)||link.match(/youtube\.com\/(?:shorts|live|embed)\/([a-zA-Z0-9_-]{6,})/i);return m?m[1]:null;}
+  const seenYt=new Set();
+  let totAlc=0,totInt=0;
+  filtered.forEach(d=>{const yt=ytId(d.link);if(yt){if(seenYt.has(yt))return;seenYt.add(yt);}totAlc+=d.alcances;totInt+=d.interacciones;});
   document.getElementById('kRegistros').textContent = fmt(filtered.length);
   document.getElementById('kAlcances').textContent = fmt(totAlc);
   document.getElementById('kInteracciones').textContent = fmt(totInt);
