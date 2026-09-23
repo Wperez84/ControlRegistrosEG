@@ -1,1126 +1,293 @@
-<title>Toyota Media Dashboard</title>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOYOTA Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:        #0f1117;
-  --surface:   #1a1d27;
-  --surface2:  #222535;
-  --border:    #2d3147;
-  --text:      #e2e8f0;
-  --muted:     #94a3b8;
-  --faint:     #4a5568;
-  --blue:      #3b82f6;
-  --blue-dim:  #1d3a6e;
-  --green:     #10b981;
-  --green-dim: #0d3d30;
-  --red:       #eb0a1e;
-  --red-dim:   #3d0a10;
-  --warn:      #f59e0b;
-  color-scheme: dark;
+  --bg: #0f1117;
+  --card: #1a1d27;
+  --card2: #20243a;
+  --border: #2a2d3e;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #eb0a1e;
+  --blue: #3b82f6;
+  --green: #10b981;
+  --red: #ef4444;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg:        #f0f2f7;
-    --surface:   #ffffff;
-    --surface2:  #f8f9fc;
-    --border:    #e2e6f0;
-    --text:      #1a1d27;
-    --muted:     #4a5568;
-    --faint:     #9aa3b8;
-    --blue-dim:  #dbeafe;
-    --green-dim: #d1fae5;
-    --red-dim:   #fee2e2;
-    color-scheme: light;
-  }
-}
-:root[data-theme="dark"] {
-  --bg:        #0f1117;
-  --surface:   #1a1d27;
-  --surface2:  #222535;
-  --border:    #2d3147;
-  --text:      #e2e8f0;
-  --muted:     #94a3b8;
-  --faint:     #4a5568;
-  --blue-dim:  #1d3a6e;
-  --green-dim: #0d3d30;
-  --red-dim:   #3d0a10;
-  color-scheme: dark;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; }
 
-*, *::before, *::after { box-sizing: border-box; }
+header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.badge { background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 6px; letter-spacing: 1px; text-transform: uppercase; }
+header h1 { font-size: 18px; font-weight: 600; }
+header span.sub { color: var(--muted); font-size: 13px; }
 
-body {
-  margin: 0;
-  padding-inline: 0;
-  padding-block: 0;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100%;
+.filters { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.filter-group input, .filter-group select {
+  background: var(--card2); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; border-radius: 6px; font-size: 13px; font-family: inherit;
+  min-width: 130px;
 }
+.filter-group input:focus, .filter-group select:focus { outline: 2px solid var(--accent); }
+.btn { padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; }
+.btn-clear { background: var(--border); color: var(--text); }
+.btn-export { background: var(--accent); color: #fff; }
+.btn:hover { opacity: .85; }
 
-/* ─── HEADER ─────────────────────────────────────────────── */
-.header {
-  position: sticky;
-  top: env(safe-area-inset-top, 0px);
-  z-index: 100;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  height: 56px;
-}
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.toyota-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.toyota-wordmark {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--red);
-  text-transform: uppercase;
-}
-.header-sep {
-  width: 1px;
-  height: 24px;
-  background: var(--border);
-}
-.header-subtitle {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-#status-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.pulse-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--faint);
-  transition: background 0.3s;
-}
-.pulse-dot.loading { background: var(--warn); animation: pulse 1s infinite; }
-.pulse-dot.live    { background: var(--green); }
-.pulse-dot.error   { background: var(--red); }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.kpis { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; }
+.kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 140px; }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 6px; }
+.kpi-val { font-size: 26px; font-weight: 700; }
+.kpi-val.accent { color: var(--accent); }
+.kpi-val.blue { color: var(--blue); }
+.kpi-val.green { color: var(--green); }
 
-/* ─── MAIN LAYOUT ─────────────────────────────────────────── */
-.main {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 24px;
-}
-@media (max-width: 600px) {
-  .main { padding: 16px 16px; }
-  .header { padding: 0 16px; }
-}
+.section { padding: 0 16px 16px; }
+.section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 10px; }
 
-/* ─── KPI CARDS ───────────────────────────────────────────── */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-@media (max-width: 700px) { .kpi-row { grid-template-columns: 1fr; } }
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--card2); padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); white-space: nowrap; }
+td { padding: 9px 12px; border-top: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tr:hover td { background: rgba(255,255,255,.03); }
+td a { color: var(--accent); text-decoration: none; }
+td a:hover { text-decoration: underline; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.blue { color: var(--blue); }
+.green { color: var(--green); }
+.tag { display: inline-block; background: var(--card2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11px; }
 
-.kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px 24px;
-  position: relative;
-  overflow: hidden;
-}
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-.kpi-card.kpi-registros::before { background: var(--red); }
-.kpi-card.kpi-alcance::before   { background: var(--blue); }
-.kpi-card.kpi-inter::before     { background: var(--green); }
+.previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.preview-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.preview-meta { padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+.preview-meta .p-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.preview-meta .p-sub { font-size: 11px; color: var(--muted); }
+.preview-card iframe { display: block; width: 100%; border: none; }
+.preview-card.vertical { max-width: 200px; justify-self: center; }
+.link-card { padding: 16px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.link-card:hover { background: var(--card2); }
+.link-icon { font-size: 24px; }
+.link-url { font-size: 11px; color: var(--muted); word-break: break-all; }
 
-.kpi-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.kpi-value {
-  font-size: 36px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-.kpi-card.kpi-registros .kpi-value { color: var(--red); }
-.kpi-card.kpi-alcance .kpi-value   { color: var(--blue); }
-.kpi-card.kpi-inter .kpi-value     { color: var(--green); }
-.kpi-sub {
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--muted);
-}
+.empty { text-align: center; color: var(--muted); padding: 40px; }
 
-/* ─── FILTERS ─────────────────────────────────────────────── */
-.filters-bar {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: flex-end;
+@media(max-width:600px) {
+  .kpi-val { font-size: 20px; }
+  header h1 { font-size: 15px; }
 }
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 140px;
-}
-.filter-group.wide { min-width: 180px; }
-.filter-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.filter-input, .filter-select {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13px;
-  padding: 7px 10px;
-  height: 34px;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.filter-input:focus, .filter-select:focus {
-  border-color: var(--blue);
-}
-.filter-select { cursor: pointer; }
-.filter-actions {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 14px;
-  border: none;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
-  white-space: nowrap;
-}
-.btn:active { transform: scale(0.97); }
-.btn-primary { background: var(--blue); color: #fff; }
-.btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-red     { background: var(--red); color: #fff; }
-.btn:hover   { opacity: 0.85; }
-
-/* ─── TABLE ───────────────────────────────────────────────── */
-.table-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 24px;
-}
-.table-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.table-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-}
-.table-count {
-  font-size: 12px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.table-wrap { overflow-x: auto; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-thead th {
-  background: var(--surface2);
-  padding: 10px 14px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  white-space: nowrap;
-  border-bottom: 1px solid var(--border);
-}
-tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background 0.1s;
-}
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--surface2); }
-tbody td {
-  padding: 11px 14px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-.td-fecha { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-.td-proyecto { font-weight: 600; max-width: 200px; white-space: normal; line-height: 1.3; }
-.td-red { }
-.td-marca { color: var(--muted); }
-.td-tipo { }
-.td-alcance {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--blue);
-  text-align: right;
-  font-family: 'JetBrains Mono', monospace;
-}
-.td-inter {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--green);
-  text-align: right;
-  font-family: 'JetBrains Mono', monospace;
-}
-.td-link a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  display: inline-block;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-}
-.td-link a:hover { color: var(--blue); text-decoration: underline; }
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.badge-yt    { background: #450a0a; color: #fca5a5; }
-.badge-ig    { background: #2d1442; color: #d8b4fe; }
-.badge-fb    { background: #1e3a5f; color: #93c5fd; }
-.badge-tt    { background: #0a2e1a; color: #6ee7b7; }
-.badge-tw    { background: #0a2233; color: #7dd3fc; }
-.badge-other { background: var(--surface2); color: var(--muted); }
-
-.empty-state {
-  padding: 48px 24px;
-  text-align: center;
-  color: var(--muted);
-}
-.empty-icon { font-size: 32px; margin-bottom: 12px; }
-.empty-text { font-size: 14px; }
-
-/* ─── PREVIEWS ────────────────────────────────────────────── */
-.previews-section {
-  margin-bottom: 24px;
-}
-.section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-.previews-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
-}
-.preview-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: border-color 0.2s, transform 0.15s;
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
-  color: var(--text);
-}
-.preview-card:hover {
-  border-color: var(--blue);
-  transform: translateY(-2px);
-}
-.preview-thumb {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  display: block;
-  background: var(--surface2);
-}
-.preview-thumb.vertical {
-  aspect-ratio: 9/16;
-  max-height: 280px;
-}
-.preview-thumb-placeholder {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: var(--surface2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--faint);
-  font-size: 28px;
-}
-.preview-info {
-  padding: 10px 12px;
-}
-.preview-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.preview-red { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.preview-stats {
-  display: flex;
-  gap: 10px;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  font-family: 'JetBrains Mono', monospace;
-}
-.preview-reach { color: var(--blue); }
-.preview-inter { color: var(--green); }
-.preview-title {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ─── LOADING STATE ───────────────────────────────────────── */
-.loading-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 24px;
-  gap: 16px;
-}
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border);
-  border-top-color: var(--red);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { color: var(--muted); font-size: 14px; }
-
-/* ─── CSV MODAL ───────────────────────────────────────────── */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: 24px;
-}
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 640px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.modal-head {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.modal-title { font-weight: 600; font-size: 14px; }
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 18px;
-  padding: 0;
-  line-height: 1;
-  transition: color 0.15s;
-}
-.modal-close:hover { color: var(--text); }
-.modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
-.csv-area {
-  width: 100%;
-  height: 240px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  padding: 10px;
-  resize: vertical;
-  outline: none;
-}
-.modal-foot {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-.copy-feedback { font-size: 12px; color: var(--green); align-self: center; margin-right: auto; opacity: 0; transition: opacity 0.3s; }
-.copy-feedback.show { opacity: 1; }
-
-/* ─── SCROLLBAR ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 </style>
+</head>
+<body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-brand">
-    <div class="toyota-logo">
-      <svg width="32" height="22" viewBox="0 0 32 22" fill="none" aria-hidden="true">
-        <ellipse cx="16" cy="11" rx="15" ry="10" fill="none" stroke="#eb0a1e" stroke-width="2"/>
-        <ellipse cx="16" cy="11" rx="7" ry="10" fill="none" stroke="#eb0a1e" stroke-width="2"/>
-        <line x1="3" y1="7" x2="29" y2="7" stroke="#eb0a1e" stroke-width="2"/>
-      </svg>
-      <span class="toyota-wordmark">Toyota</span>
-    </div>
-    <div class="header-sep"></div>
-    <span class="header-subtitle">Media Dashboard</span>
+<header>
+  <div class="badge">TOYOTA</div>
+  <div>
+    <h1>Dashboard de Pauta</h1>
+    <span class="sub">Datos estáticos generados el 2026-09-23</span>
   </div>
-  <div class="header-right">
-    <div id="status-pill">
-      <div class="pulse-dot loading" id="status-dot"></div>
-      <span id="status-text">Cargando…</span>
-    </div>
+  <div style="margin-left:auto;display:flex;gap:8px;">
+    <button class="btn btn-export" onclick="exportCSV()">Exportar CSV</button>
   </div>
 </header>
 
-<!-- MAIN -->
-<div class="main" id="app">
-  <div class="loading-overlay" id="loading-view">
-    <div class="spinner"></div>
-    <div class="loading-text" id="loading-msg">Obteniendo registros…</div>
+<div class="filters">
+  <div class="filter-group">
+    <label>Fecha desde</label>
+    <input type="date" id="fDesde">
   </div>
-
-  <div id="content-view" hidden>
-    <!-- KPIs -->
-    <div class="kpi-row">
-      <div class="kpi-card kpi-registros">
-        <div class="kpi-label">Registros</div>
-        <div class="kpi-value" id="kpi-registros">—</div>
-        <div class="kpi-sub" id="kpi-registros-sub">total</div>
-      </div>
-      <div class="kpi-card kpi-alcance">
-        <div class="kpi-label">Alcance Total</div>
-        <div class="kpi-value" id="kpi-alcance">—</div>
-        <div class="kpi-sub" id="kpi-alcance-sub">impresiones</div>
-      </div>
-      <div class="kpi-card kpi-inter">
-        <div class="kpi-label">Interacciones</div>
-        <div class="kpi-value" id="kpi-inter">—</div>
-        <div class="kpi-sub" id="kpi-inter-sub">engagements</div>
-      </div>
-    </div>
-
-    <!-- FILTERS -->
-    <div class="filters-bar">
-      <div class="filter-group">
-        <div class="filter-label">Desde</div>
-        <input type="date" class="filter-input" id="f-from">
-      </div>
-      <div class="filter-group">
-        <div class="filter-label">Hasta</div>
-        <input type="date" class="filter-input" id="f-to">
-      </div>
-      <div class="filter-group">
-        <div class="filter-label">Red</div>
-        <select class="filter-select" id="f-red">
-          <option value="">Todas las redes</option>
-        </select>
-      </div>
-      <div class="filter-group wide">
-        <div class="filter-label">Proyecto / Producto</div>
-        <select class="filter-select" id="f-producto">
-          <option value="">Todos los proyectos</option>
-        </select>
-      </div>
-      <div class="filter-actions">
-        <button class="btn btn-ghost" id="btn-clear">Limpiar</button>
-        <button class="btn btn-red" id="btn-export">↓ Exportar CSV</button>
-      </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="table-section">
-      <div class="table-header">
-        <div>
-          <span class="table-title">Registros filtrados</span>
-          &nbsp;<span class="table-count" id="table-count"></span>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Proyecto</th>
-              <th>Red</th>
-              <th>Marca</th>
-              <th>Tipo de Pauta</th>
-              <th style="text-align:right">Alcance</th>
-              <th style="text-align:right">Interacciones</th>
-              <th>Link</th>
-            </tr>
-          </thead>
-          <tbody id="table-body"></tbody>
-        </table>
-        <div class="empty-state" id="table-empty" hidden>
-          <div class="empty-icon">🔍</div>
-          <div class="empty-text">No hay registros para los filtros seleccionados</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PREVIEWS -->
-    <div class="previews-section" id="previews-section">
-      <div class="section-title">Previews de contenido</div>
-      <div class="previews-grid" id="previews-grid"></div>
-    </div>
+  <div class="filter-group">
+    <label>Fecha hasta</label>
+    <input type="date" id="fHasta">
+  </div>
+  <div class="filter-group">
+    <label>Red</label>
+    <select id="fRed"><option value="">Todas</option></select>
+  </div>
+  <div class="filter-group">
+    <label>Proyecto</label>
+    <select id="fProyecto"><option value="">Todos</option></select>
+  </div>
+  <div style="display:flex;align-items:flex-end;">
+    <button class="btn btn-clear" onclick="clearFilters()">Limpiar</button>
   </div>
 </div>
 
-<!-- CSV MODAL -->
-<div class="modal-backdrop" id="csv-modal" hidden>
-  <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title">Exportar CSV</span>
-      <button class="modal-close" id="modal-close-btn">✕</button>
-    </div>
-    <div class="modal-body">
-      <textarea class="csv-area" id="csv-area" readonly spellcheck="false"></textarea>
-    </div>
-    <div class="modal-foot">
-      <span class="copy-feedback" id="copy-feedback">¡Copiado al portapapeles!</span>
-      <button class="btn btn-ghost" id="btn-copy-csv">Copiar CSV</button>
-      <button class="btn btn-ghost" id="modal-cancel-btn">Cerrar</button>
-    </div>
+<div class="kpis">
+  <div class="kpi"><div class="kpi-label">Registros</div><div class="kpi-val accent" id="kRegistros">0</div></div>
+  <div class="kpi"><div class="kpi-label">Total Alcance</div><div class="kpi-val blue" id="kAlcances">0</div></div>
+  <div class="kpi"><div class="kpi-label">Total Interacciones</div><div class="kpi-val green" id="kInteracciones">0</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Tabla de pautas</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Proyecto</th><th>Red</th><th>Marca</th>
+          <th>Tipo de Pauta</th><th class="num">Alcance</th><th class="num">Interacciones</th><th>Link</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
   </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Previews (hasta 9)</div>
+  <div class="previews" id="previewGrid"></div>
 </div>
 
 <script>
-(function() {
-  'use strict';
+const DATA = [{"id":"6WKRinaC0b6t9ThLGTyL","fecha":"2026-09-21","red":"OTRO","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/d-A2Me2aAXM?si=kBn3ynISFRiWSaf7&t=2169","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":11923,"interacciones":246},{"id":"AIA89zWkwgfeujxpOA9r","fecha":"2026-09-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/7fYllllsK4eqvKrixHgKbk?si=NHWQvFkwTjKgD2PD-f92Qg&utm_source=whatsapp&t=512&pi=D7lgbz3bTreh_","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"AixcXMundjGeGPCJpduZ","fecha":"2026-09-21","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/d-A2Me2aAXM?si=yprLBb_Kn0FwYgBZ&t=2289","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":11923,"interacciones":246},{"id":"Dtw2pHyk0X5zVsyd1jae","fecha":"2026-09-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/7fYllllsK4eqvKrixHgKbk?si=EBAiE1BjSVOe7x_VkcWMqA&utm_source=whatsapp&pi=Bph6iT65Sty3Q&t=1631","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"JPm7zozIuNRLtXf7T0IP","fecha":"2026-09-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/7fYllllsK4eqvKrixHgKbk?si=RdWXX2UaQ2iV1c6X2-DjMQ&utm_source=whatsapp&t=1480&pi=SRdgHa8vRfCwR","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"vW4m5PmBJVk9qB8NzOQ1","fecha":"2026-09-21","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/d-A2Me2aAXM?si=QB2HdSkNUUmeDeN-&t=2249","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":11923,"interacciones":246},{"id":"yraCxYFAEzsNIJyLjkbG","fecha":"2026-09-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/7fYllllsK4eqvKrixHgKbk?si=mUWLzodqTTKT_UfwO8iF9Q&utm_source=whatsapp&t=158&pi=u7O-fk5xSsSyW","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"YTpeQHdjbjH6EzCOrOf1","fecha":"2026-09-18","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/MoB6qcTeZws?si=fKgm1HiM2LbG0tQ1&t=2789","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7472,"interacciones":151},{"id":"cvt1uQAB86BrlAH6l24L","fecha":"2026-09-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/43B2EWbzYAQGar8yJtLKE2?si=F2Dh9hEeRMqoLvX4RaPz3w&utm_source=whatsapp&t=1661&pi=69_kg-fDTjG3i","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"j4FLwmoHGY0y1t7bkA6G","fecha":"2026-09-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/43B2EWbzYAQGar8yJtLKE2?si=wg1hUcVoSguG6WkryN4IHg&utm_source=whatsapp&t=99&pi=k2xBH9ZUSb2HW","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"nDTloev888wY4XsBs2eQ","fecha":"2026-09-18","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/MoB6qcTeZws?si=ARnHRgpM0tSkPRFQ&t=2724","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7472,"interacciones":151},{"id":"rQBml8OLmoI6XVfeKkY9","fecha":"2026-09-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/43B2EWbzYAQGar8yJtLKE2?si=UMzd-EJ7SI6o54O9ghB1Dg&utm_source=whatsapp&pi=i3I1QgJiQjybX&t=1531","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"BKWRX7dCO7Bd9JjbaP10","fecha":"2026-09-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/0SQpAclTepqAGEQ4zcGibd?si=AAgr93ttTwGG3i6M2nz9lA&utm_source=whatsapp&t=1448&pi=Vof5WtiFQyeyA","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"REfuWgu4Sr19agOChhyM","fecha":"2026-09-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/0SQpAclTepqAGEQ4zcGibd?si=LDQR40BhTcGoustw-915Wg&utm_source=whatsapp&t=105&pi=kMJjSmh6TtiCv","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Rcnvf3TQlkGRL0peE48E","fecha":"2026-09-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/5_LE2jpPFxY?si=AJgaQt7fvZYMw4rX&t=2763","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":18517,"interacciones":400},{"id":"WmXLTudCwM7AZmEn0ANk","fecha":"2026-09-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/5_LE2jpPFxY?si=q4N-yu3lt59j4tSL&t=2681","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":18517,"interacciones":400},{"id":"m3FQeVK4pEvfYVI3DPWF","fecha":"2026-09-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/5_LE2jpPFxY?si=XewNh108hyI4tY48&t=2729","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":18517,"interacciones":400},{"id":"GpINdwPhAEClLAnBfuOt","fecha":"2026-09-16","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/v4rr3h074TE?si=OtPzEPUvAwYc9yLW&t=4005","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":16852,"interacciones":395},{"id":"IYgRXDst49mtjhjo1frK","fecha":"2026-09-16","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/3Hnpcl2SwyeR1yYonPp9RD?si=gBWkf6gHRTOW5DknJXiyVg&utm_source=whatsapp&pi=amyx2i-uTx-Gz&t=1495","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"X2guNjQdoPCx5ho13mQA","fecha":"2026-09-16","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/3Hnpcl2SwyeR1yYonPp9RD?si=yq9dEyjaTkyTZlfulG7Jfw&utm_source=whatsapp&t=94&pi=c5cUCtwLTbWzp","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"b6QEXK32IHuX5MuYrLsn","fecha":"2026-09-16","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/v4rr3h074TE?si=36RwGP9sfl922RGz&t=4058","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":16852,"interacciones":395},{"id":"gNmzBo70dbJcpqOSH0jc","fecha":"2026-09-16","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/v4rr3h074TE?si=YalC5mWetNYw88DA&t=3975","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":16852,"interacciones":395},{"id":"DXOnsl58gkH9oLwRfyYI","fecha":"2026-09-15","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/0zw0YbKCdec8sqt8V7j0MR?si=VWEq3uUuQ-6JkbKDEPDHQQ&utm_source=whatsapp&pi=oAoeAlw8RhGqO&t=1836","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"EatsvIBF4t5vRv0luOss","fecha":"2026-09-15","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/UopUm3a6gtQ?si=mRmS63iKZls3yYpG&t=2602","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9007,"interacciones":214},{"id":"KHav1hlOES5iXd3fasEx","fecha":"2026-09-15","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/UopUm3a6gtQ?si=U2rcm6ZyKW50-pVR&t=2523","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9007,"interacciones":214},{"id":"b88nVneCVxTr0mXWifeK","fecha":"2026-09-15","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/0zw0YbKCdec8sqt8V7j0MR?si=_Ysn0lR6RsePyEP31mOziw&utm_source=whatsapp&t=395&pi=uIKY9gjnTqyuo","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"vpDbT3ITiBAll1iNFQ67","fecha":"2026-09-15","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/UopUm3a6gtQ?si=5wReFxWy27bEGU3v&t=2636","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9007,"interacciones":214},{"id":"1AsAc4VHaEbrOcAuXg9x","fecha":"2026-09-14","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/wRZEezGj8Lc?si=yR2GQtpuunXe4KGl&t=2011","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10987,"interacciones":220},{"id":"28L7VLI2INU7cFK1UGvN","fecha":"2026-09-14","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/wRZEezGj8Lc?si=9jW2FjU3jYz5r2y0&t=2131","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10987,"interacciones":220},{"id":"2OsN0dN15znAmHX2PZWU","fecha":"2026-09-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1KoY5cYvhZPHk1GjsYfCBH?si=xHi2cExWSAS3bgCFNp4_2w&utm_source=whatsapp&pi=zsshk504TF21P&t=97","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"K9oPeVYg99PqYnmfaYmm","fecha":"2026-09-14","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/wRZEezGj8Lc?si=enug_LoFhcDvQS_S&t=2088","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10987,"interacciones":220},{"id":"YsLo1iJffE0mzeG7FO8K","fecha":"2026-09-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1aULOy8mAkwAb2mpypdbbU?si=vaLs8xM3QhmhzJUceZ6hCA&utm_source=whatsapp&pi=RvlyINhYQs-6Z&t=1514","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"6t36iY7Q40G8ZcBe2zNM","fecha":"2026-09-11","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/hs6gvYvv-9I?si=fh5hZ0fDZBhB7f7R&t=1295","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9139,"interacciones":151},{"id":"Gwfjw9jL5lwUDtUdUxZk","fecha":"2026-09-11","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/hs6gvYvv-9I?si=2db3vCRx3iKXd4Wy&t=1253","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9139,"interacciones":151},{"id":"cfkAY53JfNOYTzPpRKVb","fecha":"2026-09-11","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/hs6gvYvv-9I?si=jO7EW0GLYx6eB39B&t=1177","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9139,"interacciones":151},{"id":"pRTR0NEp9grIwTYB3ye7","fecha":"2026-09-11","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/5fI1ibw9qbwDGwL6zKold2?si=dJ7WvTbfQ_yV_mZErdF7hQ&utm_source=whatsapp&t=95&pi=wFAUH0yjTbO70","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"qw3M0kvkG1oCfEmivm2U","fecha":"2026-09-11","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/5fI1ibw9qbwDGwL6zKold2?si=syk67-aURmiwE9DdDsjquA&utm_source=whatsapp&t=1517&pi=9vq7toVZSxmiM","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"ICSXYIzJEbNnsSbio5uB","fecha":"2026-09-10","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/0HFrQ01POy8?si=-As8tnr5BYlj1JW-&t=2984","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":24375,"interacciones":490},{"id":"KZVcTe7bj7zlLYRxVJnI","fecha":"2026-09-10","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1aULOy8mAkwAb2mpypdbbU?si=RTkUTGnlQYyDPipJbvvTkA&utm_source=whatsapp","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"qi90y70qQbOgCtzPtmiz","fecha":"2026-09-10","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1aULOy8mAkwAb2mpypdbbU?si=IXnCtPXxTRSKPJByQXf0Zg&utm_source=whatsapp&pi=o9ASwDQcQf2qu&t=1514","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"vXidh3HpUXeA5dhem8hE","fecha":"2026-09-10","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/0HFrQ01POy8?si=YWRHteM1UGXmtI1S&t=3061","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":24375,"interacciones":490},{"id":"1XysQaDXuPs1Wfr5bXoJ","fecha":"2026-09-09","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/L8CD0xPafww?si=gQQ-Nij80WFnwuGX&t=3840","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":14268,"interacciones":405},{"id":"G0EIMwWvGMAVaGQsROWK","fecha":"2026-09-09","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/19sKKEnZ9Kyi2zbo8QcmPa?si=agK3gfNUTAC2uS_fHeGmcg&utm_source=whatsapp&t=1401&pi=ChMCIkJQRX6gK","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"NCSqxjjdoj66AyMEeqer","fecha":"2026-09-09","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/L8CD0xPafww?si=mBhIt7DotVFxg2dS&t=3792","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":14268,"interacciones":405},{"id":"zGl61mogqZ0ck8h3jCE4","fecha":"2026-09-09","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/19sKKEnZ9Kyi2zbo8QcmPa?si=bWOyR4hjTMSlszl9cyGmkg&utm_source=whatsapp&t=121&pi=zR8TjW3oS5KN6","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"1oKg4mHhe8tM1eCNQH11","fecha":"2026-09-08","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/HcoMru4Rg90?si=DBDPqZzTiBuLjKba&t=4158","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8180,"interacciones":211},{"id":"O04cTnW0Y1kR5ljnqZYP","fecha":"2026-09-08","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/HcoMru4Rg90?si=ulnopFavkZMM1VrG&t=4112","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8180,"interacciones":211},{"id":"VbSu2VAKVCrVrKcEbyx0","fecha":"2026-09-08","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/HcoMru4Rg90?si=2oOybORDiaj_lArB&t=4060","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8180,"interacciones":211},{"id":"untMOkum4wegf9K3yKhm","fecha":"2026-09-08","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/41pKC1OH9E0hYRADCBTIjL?si=8r4xjDK-TIikJ4f40YYUsg&utm_source=whatsapp&pi=0NcwZ0f1R0iRQ&t=348","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"z9pkmM7m9jLkfzKYdnqX","fecha":"2026-09-08","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/41pKC1OH9E0hYRADCBTIjL?si=tSwXcKufToeGhWNJtLuYdQ&utm_source=whatsapp&pi=inmr2V7kTjOS-&t=1657","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"0z7novMX43jmpduES06U","fecha":"2026-09-07","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/5HoYzFfuNtt4oMVA73pcXP?si=JqJqQuRRQTa2_wrIz1E6Cg&utm_source=whatsapp&t=151&pi=M79p2ySGQy6r4","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"HNkcVRn39ZlZN5LnybdP","fecha":"2026-09-07","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/2JyPW9QzuE8?si=w11gb1cZmDBzi5Go&t=4286","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7902,"interacciones":191},{"id":"d7O72kyfjtWQoGTHtzhr","fecha":"2026-09-07","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/5HoYzFfuNtt4oMVA73pcXP?si=XjPVLDZ9RsWlNZZrNuZqEA&utm_source=whatsapp&t=1703&pi=dDsu6XAQR62WB","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"h9YP0RvRvZccusfxrpNu","fecha":"2026-09-07","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/2JyPW9QzuE8?si=3hfGHF0kUSJRSZyR&t=4364","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7902,"interacciones":191},{"id":"JVjp92590PUtVwBQoXKc","fecha":"2026-09-04","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2ODujdPZ1GUFsX1GMzFFZY?si=lFDvR0PjSIWuj6_qaLiNLw&utm_source=whatsapp&pi=cRjkK-nZQW68B&t=107","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"L3979Oa61yzPzWPQPWDL","fecha":"2026-09-04","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/XYXfVNIs7nM?si=rUTfmvtCctXGVHbz&t=2519","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4886,"interacciones":85},{"id":"PrQRhoiX88iS4mEesghk","fecha":"2026-09-04","red":"OTRO","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/XYXfVNIs7nM?si=sZnEdvlL7V_YeLHP&t=2616","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4886,"interacciones":85},{"id":"mSOgiqcrJBizEslUHBvX","fecha":"2026-09-04","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2ODujdPZ1GUFsX1GMzFFZY?si=PMgz_6LwTkiZB5CIkyyk0g&utm_source=whatsapp&pi=bQR0ALWcSh2OM&t=1650","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"4rNJpBmgYgRUsbBdqHRW","fecha":"2026-09-03","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/Vuo4mmrvHQg?si=diCeXDQnaraOJYoM&t=2183","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7283,"interacciones":179},{"id":"7LFHnzoIMP8mL6LKxHmz","fecha":"2026-09-03","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2td5qOZMQjId2HknTEsI3R?si=n2wwY9qnQ7SAedg0VSmujQ&utm_source=whatsapp&pi=IuqNFGnjSii7x&t=114","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"DUaUuBLKYLKqf4hg5UWO","fecha":"2026-09-03","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/Vuo4mmrvHQg?si=uc9kaZZmVtRvYaq6&t=2137","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7283,"interacciones":179},{"id":"qoCVpC9L5jZkj1k0gBM5","fecha":"2026-09-03","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2td5qOZMQjId2HknTEsI3R?si=P3X-OxEvQ4-Q8-c4f-n1tA&utm_source=whatsapp&pi=87UXVwsXT4uth&t=1602","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"6eAkeevV8AeoKLa23KoK","fecha":"2026-09-02","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/l096R6ARrqw?si=z7WWq4swnF_SKWvD&t=3453","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6578,"interacciones":136},{"id":"8uHbVeGA5jUHCImnsXUq","fecha":"2026-09-02","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/75j0STh2a7wk8jKSpOTYlx?si=4SZULXarS4mz37wBX0MHPg&utm_source=whatsapp&pi=VRZpAfTjTjq0-&t=1485","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"9vATqpKiJ0JzLGp68yuE","fecha":"2026-09-02","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/75j0STh2a7wk8jKSpOTYlx?si=p5FcYwfjSoOISzcTK02M1g&utm_source=whatsapp&t=110&pi=FFCdptICSoWZa","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"yyRobkJIdbT34VXale00","fecha":"2026-09-02","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/l096R6ARrqw?si=ljm6_oenHlbOcfNi&t=3406","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6578,"interacciones":136},{"id":"MuIHlt2ZATGLM39YVZa1","fecha":"2026-09-01","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/6t9ZpQj2TaSuEPRaehp0G3?si=kAoY-URgRP6yDzK4H9n3oQ&utm_source=whatsapp&pi=-twYrSVjT2mHm&t=106","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"WP4qvWaCvm0a5MgLnLaV","fecha":"2026-09-01","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/6t9ZpQj2TaSuEPRaehp0G3?si=gSviwOLwTCG30_PEW2Xtaw&utm_source=whatsapp&pi=UeBIMRfQQpSEQ&t=1528","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"a4KC824fTd4FLs666AYz","fecha":"2026-09-01","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/0Sc4cUmXo8I?si=jTzFlf0y505A_y68&t=2744","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8362,"interacciones":197},{"id":"el6FPbUKB965FuzwhSr7","fecha":"2026-09-01","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/0Sc4cUmXo8I?si=3_MWFy9PNZkfiQDd&t=2780","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8362,"interacciones":197},{"id":"rNVPqqVvyKZ01slT5nuO","fecha":"2026-09-01","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/0Sc4cUmXo8I?si=FBbVHDB03m79OtX7&t=2697","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8362,"interacciones":197},{"id":"6NYy2shcgPJ2KedtRwki","fecha":"2026-08-31","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/4nPUG38imVmh7h1xnwXdel?si=qoX7XkK7QoCyvzxK6_oOwg&utm_source=whatsapp&pi=aKDHKsCeRTa07&t=404","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"P0KCj4HDXVmyfHDS3Ebg","fecha":"2026-08-31","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/4nPUG38imVmh7h1xnwXdel?si=MO_7ULPwSTG-aY2lE2s08Q&utm_source=whatsapp&pi=WsR7jNvBSzm9x&t=1458","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"UsHmfbLHjbEQnUVzQpVT","fecha":"2026-08-31","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/-L-jHl3IVPk?si=HI-sbFDGZqr2XabW&t=3823","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8005,"interacciones":152},{"id":"pj2Wl8oL0ZSIHy8sU34e","fecha":"2026-08-31","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/4nPUG38imVmh7h1xnwXdel?si=ecOZ4q_MTRWCXaLGh3XE9A&utm_source=whatsapp&t=117&pi=sJuU-lKjSxmdC","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"sl1ZPIFEvJ6xRiBkU3Xj","fecha":"2026-08-31","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/4nPUG38imVmh7h1xnwXdel?si=JqFEBKg6SMyaBX_9Tky_DA&utm_source=whatsapp&t=2309&pi=tbmR_MNqR9-XK","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"v2SYAnoLjiDzc6ViPXl4","fecha":"2026-08-31","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/-L-jHl3IVPk?si=55SS5YNiIAUfS48k&t=3859","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8005,"interacciones":152},{"id":"yMGJJpChqsLeGxTD9xZ6","fecha":"2026-08-31","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/-L-jHl3IVPk?si=qkqm0Fk3T_IHQqGM&t=3778","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8005,"interacciones":152},{"id":"3Tul3d2OGiSa91jj4ys0","fecha":"2026-08-28","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1O3U7TF4o57MEiJSL4AYVW?si=L--xHXFjQuu_mXAU5AH4xQ&utm_source=whatsapp&t=102&pi=TeRCeyaERIKrV","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"86N1fnMRUQmbbL20wwvE","fecha":"2026-08-28","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/e05PcIzbGj0?si=-h18UsDhftwdxuxG&t=3192","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4815,"interacciones":90},{"id":"Alstf5UQGx0DkZWPA6vp","fecha":"2026-08-28","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/e05PcIzbGj0?si=cl67URFz4ySUeA73&t=3240","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4815,"interacciones":90},{"id":"LpcqGp1O5LQCpJwisMcQ","fecha":"2026-08-28","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/1O3U7TF4o57MEiJSL4AYVW?si=_i71T-5yQ1OenABm_VsD1A&utm_source=whatsapp&t=2547&pi=Bicv8eQNTIK49","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"yYsL8LdSiZU4i4steHW1","fecha":"2026-08-28","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/1O3U7TF4o57MEiJSL4AYVW?si=hMNylbpsTJu-Z6kMgzYFwg&utm_source=whatsapp&t=1191&pi=4k25sfG9Ru-vy","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"zM1Q5HMcSIGqxg5r3JbU","fecha":"2026-08-28","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1O3U7TF4o57MEiJSL4AYVW?si=zsanhkxfT7u2PrBL4Q5p7A&utm_source=whatsapp&pi=bdRSVZKsQXibo&t=1360","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"0mTLM2JpTkDpsYyVeRAB","fecha":"2026-08-27","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/oEsXxsMU2FE?si=vWFTzLbhoNnXn9-A&t=2535","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":12656,"interacciones":342},{"id":"XxTVu66x28OhKrnJw75A","fecha":"2026-08-27","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/oEsXxsMU2FE?si=ZSEsdB_X8twgTMPa&t=2631","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":12656,"interacciones":342},{"id":"aFCVlxcxU57nIbGGcly0","fecha":"2026-08-27","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/10T0csSXBJKMmR27pxvsKU?si=RKHOT-VsToa8QzMnJS5aYA&utm_source=whatsapp&pi=GVz5CJ0zRR-b5&t=1695","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"j3qeJHZWCjFTnm3WMcgr","fecha":"2026-08-27","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/10T0csSXBJKMmR27pxvsKU?si=ui9fPXJoQv2javTGkxuVxw&utm_source=whatsapp&t=1466&pi=ijZEUrgZToSWY","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"pUHCAUSfmMBDC2RyhJ3o","fecha":"2026-08-27","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/10T0csSXBJKMmR27pxvsKU?si=Ccdxn6UXSASdgMh1cohvNA&utm_source=whatsapp&pi=ZQCTNVZoRaG_q&t=145","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"vXMH9XPBIVeahY0AbeJ9","fecha":"2026-08-27","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/oEsXxsMU2FE?si=u-n6M9VJKIdnQQxH&t=2490","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":12656,"interacciones":342},{"id":"zF5JZAwZGZMzpFGtGsL8","fecha":"2026-08-27","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/10T0csSXBJKMmR27pxvsKU?si=94oVqwhwTNuyNLFKsDqdYA&utm_source=whatsapp&pi=yZhEVzQ_QOakt&t=2590","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"FNEGHGz2wLhDIKx3pkOD","fecha":"2026-08-26","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2iVFnwuCFNU9ZOH5cd6F8y?si=Ts1B1XufRsSEBnlLCQNiwg&utm_source=whatsapp&pi=pvWwo3ivSJeQt&t=224","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"HZSNBmJj5TCpbxW3LGuA","fecha":"2026-08-26","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/2iVFnwuCFNU9ZOH5cd6F8y?si=nx_pfWONQJeZOOzmwEvjXQ&utm_source=whatsapp&t=511&pi=vWvxpe2oRGqGI","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"RalMsaffrP1QIgMhTxr5","fecha":"2026-08-26","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2iVFnwuCFNU9ZOH5cd6F8y?si=RP6CREhvTAyOJN5MTDXeQQ&utm_source=whatsapp&pi=oDmAri4xQZuG7&t=1497","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"kmI1gizffXU0m2pKVO1b","fecha":"2026-08-26","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/2iVFnwuCFNU9ZOH5cd6F8y?si=GtgzIpFjRtCJxQG90IbWFw&utm_source=whatsapp&t=2440&pi=BD97BHUWTLqVg","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"nVY91giKX4VWefi21esq","fecha":"2026-08-26","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/FOK-m77tMuM?si=oaFKfn9vB6nPoE_Q&t=3917","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":12450,"interacciones":346},{"id":"yjDUFZiUt5hGCkriziuY","fecha":"2026-08-26","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/FOK-m77tMuM?si=sUaj5scMrNl8pJRK&t=3958","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":12450,"interacciones":346},{"id":"7iJRUdE2m5nDv5g0OI0A","fecha":"2026-08-25","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/pQZuz2vei1o?si=6OGriGiSF6Dbqj3U&t=3546","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9088,"interacciones":272},{"id":"EuyosKkhC1g85kcQUs6H","fecha":"2026-08-25","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/7gtmPfdojhWYXe2lodWHlH?si=MGKuvVQAQ5aaAwn4YCaSTQ&utm_source=whatsapp&pi=yzWOJILrQfGgq&t=1811","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"QLDXbA871AFpg7fFfn3D","fecha":"2026-08-25","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/pQZuz2vei1o?si=rCK6Vngk9IJ0F2he&t=3577","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9088,"interacciones":272},{"id":"a31Gz6rxsrtcAmngcycg","fecha":"2026-08-25","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/7gtmPfdojhWYXe2lodWHlH?si=dDk1PSEmR9u_mn6jxjM1pA&utm_source=whatsapp&t=2772&pi=I4cQUZ2FToOpx","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"dUomTScQFXE74l5bYV1S","fecha":"2026-08-25","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/7gtmPfdojhWYXe2lodWHlH?si=hJrB4Zf9TgC6H2Gdao261Q&utm_source=whatsapp&pi=T7yjbDHgRFmDf&t=1675","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"kf72MOEF7ScHZhWopjA8","fecha":"2026-08-25","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/pQZuz2vei1o?si=3FO2Xi8BfUSq3IzR&t=3499","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":9088,"interacciones":272},{"id":"w2q31UtPi08RY5CtMydF","fecha":"2026-08-25","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/7gtmPfdojhWYXe2lodWHlH?si=4q9F35N5SwCsU2tKixSm0g&utm_source=whatsapp&pi=JEXrQ4jvRDyhw&t=202","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"1BX0f3m90KDXVEXPBNrn","fecha":"2026-08-24","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/62wyjs05iL2ZNhFsrKRFKR?si=Y7GG3nbwSdWKE3WbjSF3Ng&utm_source=whatsapp&pi=TVjlvWrUTgCSS&t=113","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"5DYtDH1j0perGmQhSRAm","fecha":"2026-08-24","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/JXKMkxGwqSw?si=uufsnKOgLzMFy15Q&t=2123","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6349,"interacciones":175},{"id":"71ye17g1oyjcSuTvsvAk","fecha":"2026-08-24","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/JXKMkxGwqSw?si=qd4Dd7fEdsmDEnYe&t=2091","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6349,"interacciones":175},{"id":"HjFwSyTrkdSMvaoFuSks","fecha":"2026-08-24","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/62wyjs05iL2ZNhFsrKRFKR?si=0LVa_Mk_RAGxurG2s2G7Vg&utm_source=whatsapp&t=1556&pi=jWJuP5slR9Wln","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"J8OS9sTE3KJEs3DKB3Ab","fecha":"2026-08-24","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Cortina","link":"https://www.youtube.com/live/JXKMkxGwqSw?si=GwDUXjeJlqZ6RkB3&t=2074","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6349,"interacciones":175},{"id":"YRKzgEhd5x5USekVAcHr","fecha":"2026-08-24","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/62wyjs05iL2ZNhFsrKRFKR?si=m9_E7FQ5RmWv_AFiF1zMgQ&utm_source=whatsapp&t=1338&pi=5gVHYiz4QDG-f","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"qXDJlpi6I2wQyfi1XEQ6","fecha":"2026-08-24","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/62wyjs05iL2ZNhFsrKRFKR?si=UcRpsvWXTUSfzsVZTLdoZg&utm_source=whatsapp&pi=SOoCLkiHRVioN&t=1699","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"tWNGejhL7ev9RZa69nuN","fecha":"2026-08-24","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/JXKMkxGwqSw?si=sYj-WOvn7RPq7keh&t=2044","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6349,"interacciones":175},{"id":"1MpptTeNExx2qnbHmFB5","fecha":"2026-08-21","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/yb2jyOz2wXY?si=qauTdJo0zW1NM2tA&t=3244","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4865,"interacciones":166},{"id":"DsRiCIciMeKJ1D1mJ7yA","fecha":"2026-08-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/49ywOIcWh9XxDvoou77gTL?si=PgGGsG-aRJmCvs1c35SwFA&utm_source=whatsapp&pi=pt4nIzimT5Oc5&t=2473","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"G19qFuWYZV1cNhXmyngv","fecha":"2026-08-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/49ywOIcWh9XxDvoou77gTL?si=blMUEuUfRSOhNcRy4IHwqA&utm_source=whatsapp&pi=2LXJkSctR-Ght&t=1346","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Qw98DvNjRZyECUnIPESK","fecha":"2026-08-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/49ywOIcWh9XxDvoou77gTL?si=oybvbabPSoe935jI6n47Hg&utm_source=whatsapp&t=166&pi=YgMfmaJzRV2iL","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"ghuU3oj888is2gc6Lyfa","fecha":"2026-08-21","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/49ywOIcWh9XxDvoou77gTL?si=0JPfI6teSNGvmMZtQa8yzQ&utm_source=whatsapp&pi=F71BBE9sSlade&t=1554","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"hEU36mbMmv3WdLMjfFQE","fecha":"2026-08-21","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/yb2jyOz2wXY?si=g_0nKDMsL-z52QTs&t=3200","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4865,"interacciones":166},{"id":"BcG3C8S8RxYq7R6BDued","fecha":"2026-08-20","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/2WyszGmdhbw14VXhNp0zCv?si=vn2zIoKjSoa-tmqBreWuYQ&utm_source=whatsapp&t=2629&pi=mIiOY-jTRSO7l","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Fv16Ysj2W4TpcD0Ha4WP","fecha":"2026-08-20","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2WyszGmdhbw14VXhNp0zCv?si=oTUvbwJgRfGo6cGJzZ3MSA&utm_source=whatsapp&t=109&pi=onEZRQt0R1mAf","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Ks8WCMKYZ4IRBYcfH4eq","fecha":"2026-08-20","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/2WyszGmdhbw14VXhNp0zCv?si=5BUiOYUiTCCpLgq0SEjTMw&utm_source=whatsapp&pi=mu9vKRvPQhuJP&t=1301","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"PboTKrQNhXRfk6wWG29O","fecha":"2026-08-20","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/dfzrhoNbznU?si=iEBTDLucbCv3g7v-&t=2666","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10935,"interacciones":426},{"id":"ZjvxD0wmmTnLR3p1q8I9","fecha":"2026-08-20","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/dfzrhoNbznU?si=hdDbz4yaUayCQzZm&t=2701","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10935,"interacciones":426},{"id":"mL8srrZAQ0bwrOc1UDX4","fecha":"2026-08-20","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/dfzrhoNbznU?si=l5wObH1nEPVRhK75&t=3312","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10935,"interacciones":426},{"id":"yoxObPNXBnLtNvpEMZGJ","fecha":"2026-08-20","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/2WyszGmdhbw14VXhNp0zCv?si=V1wZsaakTKCC6TjoPUI7gA&utm_source=whatsapp&pi=KWU4ewhSQwWgD&t=1535","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"64ic9946a40KFiZuJNoc","fecha":"2026-08-19","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1IMhOJdjNF2OWYlDIj57GP?si=J_5JoQc-QnmvtfeWx7m80w&utm_source=whatsapp&t=127&pi=G4_Wr3QrSGKuN","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"IxFSxHJYMoxwFcNRZE1j","fecha":"2026-08-19","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1IMhOJdjNF2OWYlDIj57GP?si=0kL6mzpITEedHfjVZbhKMA&utm_source=whatsapp&pi=RZqanXMuTia37&t=1411","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"V1WuNGflXN8yRohfWKUR","fecha":"2026-08-19","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/ggem7CptQgU?si=hQPJN54nCowSgU79&t=3804","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10578,"interacciones":359},{"id":"VKsArb59YeHtvo5z3dm5","fecha":"2026-08-19","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/1IMhOJdjNF2OWYlDIj57GP?si=_iaK0pulTpyfos7X8bgs4w&utm_source=whatsapp&t=1145&pi=76nkyU9RQbCDh","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Vu86y6BIYnZZ5aTTBMKq","fecha":"2026-08-19","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/ggem7CptQgU?si=_JBwaG1W4XqJz2B9&t=3265","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10578,"interacciones":359},{"id":"aPEPtNK7Nb2LhGpmkvLV","fecha":"2026-08-19","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1IMhOJdjNF2OWYlDIj57GP?si=uZ45Idi9TciI9NibbGUs2Q&utm_source=whatsapp&t=96&pi=yWbI-K3RQnuGr","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"hhmo1qJVa88VkN704GrU","fecha":"2026-08-19","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/ggem7CptQgU?si=Y5MSqGJEhiOa_zO6&t=3221","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10578,"interacciones":359},{"id":"kQCCoji7OOjzLcbj55gs","fecha":"2026-08-19","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://open.spotify.com/episode/1IMhOJdjNF2OWYlDIj57GP?si=Oc6JQiCvTUmGw1j5EImIag&utm_source=whatsapp&pi=cbR5CoHfQpqUT&t=1441","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"zbBb21rMSABNb9DjFJFW","fecha":"2026-08-19","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://open.spotify.com/episode/1IMhOJdjNF2OWYlDIj57GP?si=JS5SZSTqSn6Cz742vt5Hzw&utm_source=whatsapp&t=2361&pi=8InC9hjcQMuZm","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"2cL9bHJqhguImwj94yha","fecha":"2026-08-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000784158714&r=123&t=123","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"JD46bUEqm0q9KG7jPjcQ","fecha":"2026-08-18","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/7O5_0zD03Lw?si=xtClb7lTjJOLOdKu&t=1394","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":5804,"interacciones":159},{"id":"XKVGzF5g3xNcsGZVRAOG","fecha":"2026-08-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000784158714&r=1293&t=1292","categoria":"Menciones","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Z4ZWesvpK9oj7Owf67KU","fecha":"2026-08-18","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Spot","link":"https://www.youtube.com/live/7O5_0zD03Lw?si=tx6IGOyA1NV0RByx&t=2056","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":5804,"interacciones":159},{"id":"eWxMxwQqKExk2XunzAMg","fecha":"2026-08-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000784158714&r=1565&t=1564","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"lMH4SQowUwaXyUzW3Fxh","fecha":"2026-08-18","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/7O5_0zD03Lw?si=L6SKtPLyfonsoPb7&t=1429","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":5804,"interacciones":159},{"id":"mldzMZVyzgpW7vn9YkXC","fecha":"2026-08-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000784158714&r=1712&t=1712","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"wnYb99wy8Y4D58QvzbLD","fecha":"2026-08-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000784158714&r=123&t=123","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"yx13dSE2Ewwe83pC3hSQ","fecha":"2026-08-18","red":"OTRO","marca":"Guriguiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000784158714&r=1555&t=1555","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"4YmXODb9JhiL8lST0DA6","fecha":"2026-08-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783930366&r=430&t=430","categoria":"Menciones","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"886F53DglutJjqXqJv61","fecha":"2026-08-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783930366&r=111&t=111","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"HE30MsN9S0Y60u98PW7r","fecha":"2026-08-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/CYmmBUbvMQ4?si=z3a1PWIqMSJmF_ZW&t=3135","categoria":"Spot/Mención/Pleca","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4657,"interacciones":143},{"id":"QgAJApWzRgYoimNL1Z4d","fecha":"2026-08-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783930366&r=122&t=120","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"ZMb6hcmpYYRu1ET7T6FL","fecha":"2026-08-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/CYmmBUbvMQ4?si=w7mxazVcs3dpLeil&t=4507","categoria":"Spot","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4657,"interacciones":143},{"id":"c7ESZU9VB84HufmBW6Ki","fecha":"2026-08-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/CYmmBUbvMQ4?si=s32nUF-XM21c2xCi&t=3164","categoria":"Logo Rotativo en Pantalla","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4657,"interacciones":143},{"id":"etfdPXPlf2KWtKDNDRBU","fecha":"2026-08-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783930366&r=1420&t=1420","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"jdjSw9hK0aUmlM6bj8Ua","fecha":"2026-08-17","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/CYmmBUbvMQ4?si=yhDXr0xRdFUE5Y68&t=4476","categoria":"Spot","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":4657,"interacciones":143},{"id":"ohHDh6EAlEcy9es0lqmP","fecha":"2026-08-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783930366&r=2398&t=2398","categoria":"Menciones","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"p6yXrjZCA21YVKbHplkw","fecha":"2026-08-17","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783930366&r=1431&t=1430","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"II7UgXZkZNsOU7gtuRft","fecha":"2026-08-14","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/elfQEeoRJ2k?si=KG6SpZnnWEBQlSro&t=1145","categoria":"Spot/Mención/Pleca","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":3383,"interacciones":95},{"id":"QgHsuvn99kXEk7l5wJ3W","fecha":"2026-08-14","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/elfQEeoRJ2k?si=rkaiXvVExuTR9BRr&t=2396","categoria":"Spot","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":3383,"interacciones":95},{"id":"UxVWwYjT24f1N4eFhb1W","fecha":"2026-08-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783394252&r=1497&t=1497","categoria":"Menciones","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"gtqONRDCktDzayz9ppRi","fecha":"2026-08-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783394252&r=140&t=139","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"iAV0LNWOg4Cj9E3GY742","fecha":"2026-08-14","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/elfQEeoRJ2k?si=EvZqrOdjUbpB2NEQ&t=1190","categoria":"Logo Rotativo en Pantalla","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":3383,"interacciones":95},{"id":"kN0apYTJPGW7MVqq2EAR","fecha":"2026-08-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783394252&r=1384&t=1384","categoria":"Menciones","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"mSZyqsfK6kuEHsRRD9m8","fecha":"2026-08-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783394252&r=478&t=478","categoria":"Menciones","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"uW2C2yFPByuW0r4KKHyP","fecha":"2026-08-14","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783394252&r=129&t=129","categoria":"Cuñas","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"6HkefRSce3R1nWLmMO73","fecha":"2026-08-13","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/8qOpcsnNjWw?si=9lEnV_ShnXJUPhil&t=2678","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8578,"interacciones":299},{"id":"Eo5ncrCjx3rgxNcitjor","fecha":"2026-08-13","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783395468&r=2775&t=2775","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"JRG87YBmuF6bMw1UG9ep","fecha":"2026-08-13","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783395468&r=136&t=136","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"MeweZOCN24yPFe0d1S9R","fecha":"2026-08-13","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783395468&r=1666&t=1666","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"SDBhsoDzSRohUW6LYP1b","fecha":"2026-08-13","red":"OTRO","marca":"Guriguiri","tipoPauta":"","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783395468&r=1382&t=1382","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"V7QYLUs5vPNhQAnm79zW","fecha":"2026-08-13","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/8qOpcsnNjWw?si=zks_3aIxoMCdq_mS&t=2699","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8578,"interacciones":299},{"id":"vLLVZqGkPIDMt2cPmWIm","fecha":"2026-08-13","red":"YOUTUBE","marca":"El Gráfico","tipoPauta":"","link":"https://www.youtube.com/live/8qOpcsnNjWw?si=CvgVPYd0npmuIh-x&t=3148","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":8578,"interacciones":299},{"id":"JuTk9HyWQrevyCBUTTrj","fecha":"2026-08-12","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/43Knu53s3fk?si=dQUI66TFOIr7qoKZ&t=2395","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6082,"interacciones":262},{"id":"LfG2rZCXNY6Um6CVBN6z","fecha":"2026-08-12","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783023515&r=1802&t=1802","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"cYIw2jfPYJc5meDXmuWu","fecha":"2026-08-12","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783023515&r=2577&t=2577","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"p0pYWDgTOBG9PmgVzeyL","fecha":"2026-08-12","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/43Knu53s3fk?si=fuKrxqRnGTnqAgnu&t=3138","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6082,"interacciones":262},{"id":"pXFbMMlQoJ8pvlCwl3ni","fecha":"2026-08-12","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783023515&r=88&t=88","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"rvBMq7OHzDoq2CTUHAQS","fecha":"2026-08-12","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000783023515&r=1477&t=1477","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"5vXfeegGcbyDgYUtBW7F","fecha":"2026-08-11","red":"SITIO WEB","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/79vfmUILToo?si=dm2Q6H3_uf-aNBWi&t=2981","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":13747,"interacciones":369},{"id":"6qKl3hU4CkSa9D220JsG","fecha":"2026-08-11","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782803343&r=116&t=116","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"DcAwBAwfQn7EcaeQiePS","fecha":"2026-08-11","red":"OTRO","marca":"EGTV","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/79vfmUILToo?si=9iy6ax2rsKmsA_wb&t=1758","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":13747,"interacciones":369},{"id":"QpdMGb0G5kPtDutWgXH3","fecha":"2026-08-11","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782803343&r=1523&t=1523","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"VKllqth8f5vOaMj0HsuM","fecha":"2026-08-11","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782803343&r=2424&t=2424","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"qCLiMGNZDZLNKUQf2lUn","fecha":"2026-08-11","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Pleca Horizontal/Pleca L","link":"https://www.youtube.com/live/79vfmUILToo?si=s9v4EqsH-FaomHU9&t=1811","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":13747,"interacciones":369},{"id":"qdJXyiUYGoPcaz90rUy9","fecha":"2026-08-11","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782803343&r=1229&t=1229","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"sBq61ExvR6bB8z0Hydkf","fecha":"2026-08-11","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782803343&r=127&t=126","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"6X8bMkU2FnuocCQQSZEn","fecha":"2026-08-10","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782063379&r=1656&t=1655","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"7jrlQWcvfD5WcLfgUZ2H","fecha":"2026-08-10","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782063379&r=318&t=317","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"A90DJvrQV2pjsYEfaoQ0","fecha":"2026-08-10","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782063379&r=308&t=308","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Rn10ul1VHqVGDG9OWvJf","fecha":"2026-08-10","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/TAa16VDmklY?si=A9I5NrTgK40jZzOL&t=3165","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6437,"interacciones":181},{"id":"XUjSzc05cRIiepDflUhf","fecha":"2026-08-10","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/TAa16VDmklY?si=gZvq79S9KA5_faOM&t=3696","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6437,"interacciones":181},{"id":"eY1fvXfk1WsQCsDQTXbL","fecha":"2026-08-10","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/TAa16VDmklY?si=eGwvUIIaeiIp44w1&t=3133","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":6437,"interacciones":181},{"id":"fb3GcQhiI3hCt67dbTAy","fecha":"2026-08-10","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782063379&r=576&t=576","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"jZwNjian8afqFWBvonJK","fecha":"2026-08-10","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782063379&r=1836&t=1836","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"tq7wIrf7uCGJNojnwM5x","fecha":"2026-08-10","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000782063379&r=1648&t=1648","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"Bue3sGIKvU0s3Zenasoa","fecha":"2026-08-06","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780306625&r=255&t=255","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"bUvX8jRw6RJpveet58nv","fecha":"2026-08-06","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780306625&r=608&t=607","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"f7dRkjT7pgnRpgGmQPtj","fecha":"2026-08-06","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780306625&r=1509&t=1508","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"gfo46CxqlJDAPhl8vyUp","fecha":"2026-08-06","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780306625&r=267&t=266","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"u7N7PxGcxntG9gw3gTq5","fecha":"2026-08-06","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780306625&r=2731&t=2731","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"ze70vzYIx3kx0iZMTOuU","fecha":"2026-08-06","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780306625&r=1499&t=1499","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"4nrP2fXXBu3uzRiMcsQB","fecha":"2026-08-05","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780114610&r=1786&t=1786","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"IBl9y8Z4EgyLzZk111aD","fecha":"2026-08-05","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/5deDINHKrUA?si=p0sQwVqCaRG8Sz_K&t=2060","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10751,"interacciones":409},{"id":"SIWrkWdVEwfC594Yxsos","fecha":"2026-08-05","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Pleca Horizontal/Pleca L","link":"https://www.youtube.com/live/5deDINHKrUA?si=zFvX4BvLmHpHq9TW&t=2043","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10751,"interacciones":409},{"id":"UIvdd5eHfMfYzQxxHBzA","fecha":"2026-08-05","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/5deDINHKrUA?si=O2XPyr9UAG4Rm0VE&t=3419","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":10751,"interacciones":409},{"id":"ehjyoDE5tYz9pvb5zODV","fecha":"2026-08-05","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780114610&r=171&t=171","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"hcSa31UMmrn0BlI6osVm","fecha":"2026-08-05","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780114610&r=562&t=562","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"miLHSDEsLADp9dD0c6pD","fecha":"2026-08-05","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000780114610&r=1639&t=1639","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"8BUGFEFlMe6Iq4ctABCu","fecha":"2026-08-04","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779934908&r=1577&t=1577","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"BQJ8Lj82gfQ2x6va5JDP","fecha":"2026-08-04","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779934908&r=164&t=164","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"KNaO8sB79RleQQ8xXUpr","fecha":"2026-08-04","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/SD8Pm5eP7qo?si=eSeIlhRxbUgvl3Dv&t=2056","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7081,"interacciones":206},{"id":"j9aAzStyRz2w3jEj5pnI","fecha":"2026-08-04","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/SD8Pm5eP7qo?si=dLdTa5BZ5xO-ca6z&t=1393","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7081,"interacciones":206},{"id":"mGeKcORyuQf06f07Yi2n","fecha":"2026-08-04","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779934908&r=1229&t=1229","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"o8DuRepk7QEL4X0KVTqA","fecha":"2026-08-04","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/SD8Pm5eP7qo?si=SaxtQua65VzFr0ga&t=1356","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":7081,"interacciones":206},{"id":"oEJhWccIreF14CIqAA1U","fecha":"2026-08-04","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779934908&r=2785&t=2784","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"8sqzlyDnn94MYb04XO2A","fecha":"2026-08-03","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/6XA33CYrOJc?si=ABIqgv02fwSgP80s&t=3914","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":5060,"interacciones":144},{"id":"HChWaIsQfjY2MkMLh59a","fecha":"2026-08-03","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Logo Rotativo en Pantalla","link":"https://www.youtube.com/live/6XA33CYrOJc?si=TSCk_LvaGtYem_-8&t=1195","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":5060,"interacciones":144},{"id":"M7U4uFJgxyLw7O662WQw","fecha":"2026-08-03","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779769406&r=1215&t=1215","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"MoR9zfEp6yDccLqQLlis","fecha":"2026-08-03","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779769406&r=163&t=163","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"NDT5z46DgWdNzqwc5j24","fecha":"2026-08-03","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Menciones","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779769406&r=2410&t=2409","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"oBUwDo7bEsGdcdii7DU6","fecha":"2026-08-03","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/sv/podcast/guiri-guiri-al-aire/id1208570881?i=1000779769406&r=1475","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"rTVI1ZcIfZ6qoGM1pusI","fecha":"2026-08-03","red":"OTRO","marca":"GuiriGuiri","tipoPauta":"Cuñas","link":"https://podcasts.apple.com/podcast/id1208570881?i=1000779769406&r=132&t=131","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":0,"interacciones":0},{"id":"wKIE5QsHGAjAs6pv6HLM","fecha":"2026-08-03","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/6XA33CYrOJc?si=aiHrRYN1SZXWTERt&t=1099","categoria":"","notas":"","productoId":"FAcWYglji7rp8hJrYLyu","productoNombre":"Pauta Habitual","alcances":5060,"interacciones":144}];
 
-  // ── CONFIG ──────────────────────────────────────────────────
-  const PROJECT    = 'ai-studio-applet-webapp-cd3f7';
-  const DATABASE   = 'controlregistroseg';
-  const API_KEY    = 'AIzaSyBkWMHpO0TqhNKH0jzcTIPlSAxpG4m__S0';
-  const CLIENT_ID  = 'bsd4GNwp8ceIUT8FWD5T';
-  const BASE_URL   = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/${DATABASE}/documents`;
+function fmt(n){return n.toLocaleString('es-GT');}
 
-  // ── STATE ────────────────────────────────────────────────────
-  let allRegistros = [];   // raw joined rows {id, fecha, red, marca, tipoPauta, link, categoria, notas, productoId, productoNombre, alcance, interacciones}
-  let filtered     = [];
+function extractYouTubeId(url){
+  if(!url) return null;
+  let m;
+  m = url.match(/[?&]v=([^&#]+)/); if(m) return m[1];
+  m = url.match(/\/shorts\/([^/?&#]+)/); if(m) return m[1];
+  m = url.match(/\/live\/([^/?&#]+)/); if(m) return m[1];
+  m = url.match(/youtu\.be\/([^/?&#]+)/); if(m) return m[1];
+  return null;
+}
 
-  // ── UTILS ────────────────────────────────────────────────────
-  function fv(v) {
-    if (!v) return '';
-    if (v.stringValue  !== undefined) return v.stringValue;
-    if (v.integerValue !== undefined) return String(v.integerValue);
-    if (v.doubleValue  !== undefined) return String(v.doubleValue);
-    if (v.booleanValue !== undefined) return String(v.booleanValue);
-    if (v.timestampValue !== undefined) return v.timestampValue;
-    return '';
+function isYouTubeShortOrLive(url){
+  return url && (url.includes('/shorts/') || url.includes('/live/'));
+}
+
+function getYouTubeEmbedUrl(url){
+  const id = extractYouTubeId(url);
+  if(!id) return null;
+  return 'https://www.youtube.com/embed/'+id;
+}
+
+// Populate selects
+const reds = [...new Set(DATA.map(d=>d.red).filter(Boolean))].sort();
+const proyectos = [...new Set(DATA.map(d=>d.productoNombre).filter(Boolean))].sort();
+const selRed = document.getElementById('fRed');
+const selProy = document.getElementById('fProyecto');
+reds.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;selRed.appendChild(o);});
+proyectos.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;selProy.appendChild(o);});
+
+function getFiltered(){
+  const desde = document.getElementById('fDesde').value;
+  const hasta = document.getElementById('fHasta').value;
+  const red = selRed.value;
+  const proy = selProy.value;
+  return DATA.filter(d=>{
+    if(desde && d.fecha < desde) return false;
+    if(hasta && d.fecha > hasta) return false;
+    if(red && d.red !== red) return false;
+    if(proy && d.productoNombre !== proy) return false;
+    return true;
+  });
+}
+
+function render(){
+  const filtered = getFiltered();
+  // KPIs
+  const totAlc = filtered.reduce((s,d)=>s+d.alcances,0);
+  const totInt = filtered.reduce((s,d)=>s+d.interacciones,0);
+  document.getElementById('kRegistros').textContent = fmt(filtered.length);
+  document.getElementById('kAlcances').textContent = fmt(totAlc);
+  document.getElementById('kInteracciones').textContent = fmt(totInt);
+
+  // Table
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  filtered.forEach(d=>{
+    const tr = document.createElement('tr');
+    const short = d.link ? (d.link.length>40 ? d.link.slice(0,40)+'…' : d.link) : '';
+    tr.innerHTML = '<td>'+d.fecha+'</td>'+
+      '<td><span class="tag">'+escH(d.productoNombre||'')+'</span></td>'+
+      '<td>'+escH(d.red||'')+'</td>'+
+      '<td>'+escH(d.marca||'')+'</td>'+
+      '<td>'+escH(d.tipoPauta||'')+'</td>'+
+      '<td class="num blue">'+fmt(d.alcances)+'</td>'+
+      '<td class="num green">'+fmt(d.interacciones)+'</td>'+
+      '<td>'+(d.link?'<a href="'+escH(d.link)+'" target="_blank" rel="noopener">'+escH(short)+'</a>':'')+'</td>';
+    tbody.appendChild(tr);
+  });
+  if(!filtered.length){
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="8" class="empty">Sin resultados</td>';
+    tbody.appendChild(tr);
   }
 
-  function docId(name) {
-    return name.split('/').pop();
-  }
-
-  function fmt(n) {
-    if (n === null || n === undefined || n === '' || isNaN(n)) return '—';
-    return Number(n).toLocaleString('es-GT');
-  }
-
-  function normYtId(url) {
-    if (!url) return null;
-    // youtu.be/ID
-    let m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
-    if (m) return m[1];
-    // /shorts/ID or /live/ID
-    m = url.match(/\/(?:shorts|live)\/([A-Za-z0-9_\-]+)/);
-    if (m) return m[1];
-    // ?v=ID or &v=ID
-    m = url.match(/[?&]v=([A-Za-z0-9_\-]+)/);
-    if (m) return m[1];
-    return null;
-  }
-
-  function isYouTube(url) {
-    return /youtube\.com|youtu\.be/.test(url || '');
-  }
-
-  function isYtShort(url) {
-    return /\/shorts\/|\/live\//.test(url || '');
-  }
-
-  function isInstagram(url) {
-    return /instagram\.com/.test(url || '');
-  }
-
-  function isTikTok(url) {
-    return /tiktok\.com/.test(url || '');
-  }
-
-  function isFacebook(url) {
-    return /facebook\.com|fb\.com/.test(url || '');
-  }
-
-  function normLink(url) {
-    if (!url) return url;
-    const ytId = normYtId(url);
-    if (ytId) return 'yt:' + ytId;
-    return url.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
-  }
-
-  function redBadge(red) {
-    const r = (red || '').toLowerCase();
-    if (r.includes('youtube') || r === 'yt') return `<span class="badge badge-yt">${red}</span>`;
-    if (r.includes('instagram') || r === 'ig') return `<span class="badge badge-ig">${red}</span>`;
-    if (r.includes('facebook') || r === 'fb') return `<span class="badge badge-fb">${red}</span>`;
-    if (r.includes('tiktok') || r === 'tt') return `<span class="badge badge-tt">${red}</span>`;
-    if (r.includes('twitter') || r.includes('x.com')) return `<span class="badge badge-tw">${red}</span>`;
-    return `<span class="badge badge-other">${red || '—'}</span>`;
-  }
-
-  function truncLink(url, max = 40) {
-    if (!url) return '—';
-    try {
-      const u = new URL(url);
-      const short = u.hostname.replace('www.', '') + u.pathname;
-      return short.length > max ? short.slice(0, max) + '…' : short;
-    } catch { return url.length > max ? url.slice(0, max) + '…' : url; }
-  }
-
-  // ── FETCH HELPERS ────────────────────────────────────────────
-  async function fetchAllDocs(collection) {
-    const docs = [];
-    let pageToken = null;
-    do {
-      const url = `${BASE_URL}/${collection}?pageSize=500&key=${API_KEY}${pageToken ? '&pageToken=' + pageToken : ''}`;
-      const res  = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${collection}`);
-      const json = await res.json();
-      if (json.documents) docs.push(...json.documents);
-      pageToken = json.nextPageToken || null;
-    } while (pageToken);
-    return docs;
-  }
-
-  async function queryRegistros() {
-    const url  = `${BASE_URL}:runQuery?key=${API_KEY}`;
-    const body = {
-      structuredQuery: {
-        from: [{ collectionId: 'registros' }],
-        where: {
-          fieldFilter: {
-            field: { fieldPath: 'clienteId' },
-            op: 'EQUAL',
-            value: { stringValue: CLIENT_ID }
-          }
-        },
-        limit: 1000
-      }
-    };
-    const res  = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    if (!res.ok) throw new Error(`HTTP ${res.status} running query`);
-    const results = await res.json();
-    return results.filter(r => r.document).map(r => r.document);
-  }
-
-  // ── MAIN FETCH & JOIN ────────────────────────────────────────
-  async function loadData() {
-    setStatus('loading', 'Cargando registros…');
-    setMsg('Obteniendo registros de Toyota…');
-
-    const [regDocs, metDocs, prodDocs] = await Promise.all([
-      queryRegistros(),
-      fetchAllDocs('metricas'),
-      fetchAllDocs('productos')
-    ]);
-
-    setMsg('Cruzando métricas…');
-
-    // Build producto map
-    const prodMap = {};
-    for (const d of prodDocs) {
-      const id   = docId(d.name);
-      const f    = d.fields || {};
-      prodMap[id] = { nombre: fv(f.nombre), color: fv(f.color) };
+  // Previews
+  const grid = document.getElementById('previewGrid');
+  grid.innerHTML = '';
+  const ytItems = filtered.filter(d=>d.link && extractYouTubeId(d.link));
+  const shown = ytItems.slice(0,9);
+  shown.forEach(d=>{
+    const embedUrl = getYouTubeEmbedUrl(d.link);
+    const isShort = isYouTubeShortOrLive(d.link) && d.link.includes('/shorts/');
+    const card = document.createElement('div');
+    card.className = 'preview-card'+(isShort?' vertical':'');
+    const metaHtml = '<div class="preview-meta"><div class="p-title">'+escH(d.fecha+' · '+d.marca)+'</div><div class="p-sub">'+escH(d.tipoPauta||'')+'</div></div>';
+    if(isShort){
+      card.innerHTML = metaHtml+'<iframe src="'+embedUrl+'" style="height:70vh;width:calc(70vh * 9/16);" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    } else {
+      card.innerHTML = metaHtml+'<iframe src="'+embedUrl+'" height="200" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
     }
+    grid.appendChild(card);
+  });
 
-    // Build metricas map: registroId → max alcance/inter
-    const metMap = {};
-    for (const d of metDocs) {
-      const f   = d.fields || {};
-      const rid = fv(f.registroId);
-      if (!rid) continue;
-      const alc = parseInt(fv(f.alcances) || 0, 10) || 0;
-      const int = parseInt(fv(f.interacciones) || 0, 10) || 0;
-      if (!metMap[rid] || alc > metMap[rid].alcance) {
-        metMap[rid] = { alcance: alc, interacciones: int };
-      }
-    }
-
-    // Build normLink → max alcance/inter (for dedup by link)
-    const linkMetMap = {};
-    for (const d of regDocs) {
-      const id  = docId(d.name);
-      const f   = d.fields || {};
-      const lnk = fv(f.link);
-      const nl  = normLink(lnk);
-      const met = metMap[id] || { alcance: 0, interacciones: 0 };
-      if (!linkMetMap[nl] || met.alcance > (linkMetMap[nl] || {}).alcance) {
-        linkMetMap[nl] = met;
-      }
-    }
-
-    // Join
-    allRegistros = regDocs.map(d => {
-      const id  = docId(d.name);
-      const f   = d.fields || {};
-      const pid = fv(f.productoId);
-      const lnk = fv(f.link);
-      const nl  = normLink(lnk);
-      const met = metMap[id] || linkMetMap[nl] || { alcance: 0, interacciones: 0 };
-      return {
-        id,
-        fecha:        fv(f.fecha),
-        red:          fv(f.red),
-        marca:        fv(f.marca),
-        tipoPauta:    fv(f.tipoPauta),
-        link:         lnk,
-        normLink:     nl,
-        categoria:    fv(f.categoria),
-        notas:        fv(f.notas),
-        productoId:   pid,
-        productoNombre: prodMap[pid]?.nombre || pid || '—',
-        alcance:      met.alcance,
-        interacciones: met.interacciones
-      };
+  // Non-YT links for remaining slots
+  if(shown.length < 9){
+    const nonYt = filtered.filter(d=>d.link && !extractYouTubeId(d.link));
+    nonYt.slice(0, 9-shown.length).forEach(d=>{
+      const card = document.createElement('div');
+      card.className = 'preview-card';
+      const short = d.link.length>60?d.link.slice(0,60)+'…':d.link;
+      card.innerHTML = '<div class="preview-meta"><div class="p-title">'+escH(d.fecha+' · '+d.marca)+'</div><div class="p-sub">'+escH(d.tipoPauta||'')+'</div></div>'+
+        '<a class="link-card" href="'+escH(d.link)+'" target="_blank" rel="noopener"><span class="link-icon">🔗</span><span class="link-url">'+escH(short)+'</span></a>';
+      grid.appendChild(card);
     });
-
-    // Sort by fecha desc
-    allRegistros.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
-
-    populateFilters();
-    applyFilters();
-
-    document.getElementById('loading-view').hidden = true;
-    document.getElementById('content-view').hidden = false;
-    setStatus('live', `${allRegistros.length} registros`);
   }
 
-  // ── FILTER CONTROLS ──────────────────────────────────────────
-  function populateFilters() {
-    const reds  = [...new Set(allRegistros.map(r => r.red).filter(Boolean))].sort();
-    const prods = [...new Set(allRegistros.map(r => r.productoNombre).filter(Boolean))].sort();
-
-    const selRed  = document.getElementById('f-red');
-    const selProd = document.getElementById('f-producto');
-
-    reds.forEach(r  => { const o = document.createElement('option'); o.value = r; o.textContent = r; selRed.appendChild(o); });
-    prods.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; selProd.appendChild(o); });
-
-    const dates = allRegistros.map(r => r.fecha).filter(Boolean).sort();
-    if (dates.length) {
-      document.getElementById('f-from').value = dates[0];
-      document.getElementById('f-to').value   = dates[dates.length - 1];
-    }
+  if(!filtered.length || (ytItems.length===0 && filtered.filter(d=>d.link).length===0)){
+    if(!grid.children.length) grid.innerHTML='<p class="empty">Sin contenido para previsualizar</p>';
   }
+}
 
-  function applyFilters() {
-    const from = document.getElementById('f-from').value;
-    const to   = document.getElementById('f-to').value;
-    const red  = document.getElementById('f-red').value;
-    const prod = document.getElementById('f-producto').value;
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    filtered = allRegistros.filter(r => {
-      if (from && r.fecha && r.fecha < from) return false;
-      if (to   && r.fecha && r.fecha > to)   return false;
-      if (red  && r.red !== red)              return false;
-      if (prod && r.productoNombre !== prod)  return false;
-      return true;
-    });
+function clearFilters(){
+  document.getElementById('fDesde').value='';
+  document.getElementById('fHasta').value='';
+  selRed.value='';
+  selProy.value='';
+  render();
+}
 
-    renderKPIs();
-    renderTable();
-    renderPreviews();
-  }
+function exportCSV(){
+  const filtered = getFiltered();
+  const cols = ['id','fecha','red','marca','tipoPauta','link','categoria','notas','productoId','productoNombre','alcances','interacciones'];
+  const header = cols.join(',');
+  const rows = filtered.map(d=>cols.map(c=>{
+    const v = d[c]===undefined?'':String(d[c]);
+    return '"'+v.replace(/"/g,'""')+'"';
+  }).join(','));
+  const bom = '﻿';
+  const csv = bom+header+'\n'+rows.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'TOYOTA-pauta.csv';
+  a.click();
+}
 
-  // ── KPIs ─────────────────────────────────────────────────────
-  function renderKPIs() {
-    const totalAlc = filtered.reduce((s, r) => s + (r.alcance || 0), 0);
-    const totalInt = filtered.reduce((s, r) => s + (r.interacciones || 0), 0);
-
-    document.getElementById('kpi-registros').textContent = fmt(filtered.length);
-    document.getElementById('kpi-alcance').textContent   = fmt(totalAlc);
-    document.getElementById('kpi-inter').textContent     = fmt(totalInt);
-    document.getElementById('kpi-registros-sub').textContent = filtered.length !== allRegistros.length ? `de ${fmt(allRegistros.length)} totales` : 'total';
-  }
-
-  // ── TABLE ─────────────────────────────────────────────────────
-  function renderTable() {
-    const tbody = document.getElementById('table-body');
-    const empty = document.getElementById('table-empty');
-    const count = document.getElementById('table-count');
-
-    count.textContent = `${fmt(filtered.length)} resultado${filtered.length !== 1 ? 's' : ''}`;
-
-    if (!filtered.length) {
-      tbody.innerHTML = '';
-      empty.hidden = false;
-      return;
-    }
-    empty.hidden = true;
-
-    tbody.innerHTML = filtered.map(r => `
-      <tr>
-        <td class="td-fecha">${r.fecha || '—'}</td>
-        <td class="td-proyecto">${escHtml(r.productoNombre)}</td>
-        <td class="td-red">${redBadge(r.red)}</td>
-        <td class="td-marca">${escHtml(r.marca) || '—'}</td>
-        <td class="td-tipo">${escHtml(r.tipoPauta) || '—'}</td>
-        <td class="td-alcance">${fmt(r.alcance)}</td>
-        <td class="td-inter">${fmt(r.interacciones)}</td>
-        <td class="td-link">${r.link ? `<a href="${escHtml(r.link)}" target="_blank" rel="noopener" title="${escHtml(r.link)}">${escHtml(truncLink(r.link))}</a>` : '—'}</td>
-      </tr>
-    `).join('');
-  }
-
-  // ── PREVIEWS ─────────────────────────────────────────────────
-  function renderPreviews() {
-    const grid = document.getElementById('previews-grid');
-    const section = document.getElementById('previews-section');
-
-    // Deduplicate by normLink, take first 9
-    const seen = new Set();
-    const items = [];
-    for (const r of filtered) {
-      if (items.length >= 9) break;
-      if (!r.link) continue;
-      const nl = r.normLink;
-      if (seen.has(nl)) continue;
-      seen.add(nl);
-      items.push(r);
-    }
-
-    if (!items.length) {
-      section.hidden = true;
-      return;
-    }
-    section.hidden = false;
-
-    grid.innerHTML = items.map(r => {
-      const url  = r.link;
-      const ytId = normYtId(url);
-      const short = isYtShort(url);
-
-      let thumbHtml = '';
-      if (ytId) {
-        const thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-        thumbHtml = `<img class="preview-thumb${short ? ' vertical' : ''}" src="${thumb}" alt="YouTube thumbnail" loading="lazy" onerror="this.style.display='none'">`;
-      } else if (isInstagram(url)) {
-        thumbHtml = `<div class="preview-thumb-placeholder" style="aspect-ratio:${isYtShort(url)?'9/16':'16/9'}">📸</div>`;
-      } else if (isTikTok(url)) {
-        thumbHtml = `<div class="preview-thumb-placeholder" style="aspect-ratio:9/16">🎵</div>`;
-      } else if (isFacebook(url)) {
-        thumbHtml = `<div class="preview-thumb-placeholder">👥</div>`;
-      } else {
-        thumbHtml = `<div class="preview-thumb-placeholder">🔗</div>`;
-      }
-
-      return `
-        <a class="preview-card" href="${escHtml(url)}" target="_blank" rel="noopener">
-          ${thumbHtml}
-          <div class="preview-info">
-            <div class="preview-meta">
-              <span class="preview-red">${escHtml(r.red) || '—'}</span>
-              <div class="preview-stats">
-                <span class="preview-reach">↗ ${fmt(r.alcance)}</span>
-                <span class="preview-inter">♥ ${fmt(r.interacciones)}</span>
-              </div>
-            </div>
-            <div class="preview-title">${escHtml(truncLink(url, 48))}</div>
-          </div>
-        </a>
-      `;
-    }).join('');
-  }
-
-  // ── CSV EXPORT ───────────────────────────────────────────────
-  function buildCsv() {
-    const header = ['Fecha', 'Proyecto', 'Red', 'Marca', 'Tipo de Pauta', 'Alcance', 'Interacciones', 'Link', 'Categoria', 'Notas'].join(',');
-    const rows   = filtered.map(r => [
-      r.fecha, r.productoNombre, r.red, r.marca, r.tipoPauta,
-      r.alcance, r.interacciones, r.link, r.categoria, r.notas
-    ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
-    return [header, ...rows].join('\r\n');
-  }
-
-  // ── STATUS ───────────────────────────────────────────────────
-  function setStatus(state, text) {
-    const dot  = document.getElementById('status-dot');
-    const span = document.getElementById('status-text');
-    dot.className  = 'pulse-dot ' + state;
-    span.textContent = text;
-  }
-
-  function setMsg(txt) {
-    document.getElementById('loading-msg').textContent = txt;
-  }
-
-  function escHtml(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── EVENTS ───────────────────────────────────────────────────
-  ['f-from','f-to','f-red','f-producto'].forEach(id => {
-    document.getElementById(id).addEventListener('change', applyFilters);
-  });
-
-  document.getElementById('btn-clear').addEventListener('click', () => {
-    document.getElementById('f-red').value      = '';
-    document.getElementById('f-producto').value = '';
-    const dates = allRegistros.map(r => r.fecha).filter(Boolean).sort();
-    if (dates.length) {
-      document.getElementById('f-from').value = dates[0];
-      document.getElementById('f-to').value   = dates[dates.length - 1];
-    }
-    applyFilters();
-  });
-
-  document.getElementById('btn-export').addEventListener('click', () => {
-    const csv = buildCsv();
-    document.getElementById('csv-area').value = csv;
-    document.getElementById('csv-modal').hidden = false;
-    document.getElementById('copy-feedback').classList.remove('show');
-  });
-
-  function closeModal() { document.getElementById('csv-modal').hidden = true; }
-  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-  document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
-  document.getElementById('csv-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-
-  document.getElementById('btn-copy-csv').addEventListener('click', () => {
-    const area = document.getElementById('csv-area');
-    const fb   = document.getElementById('copy-feedback');
-    navigator.clipboard.writeText(area.value).then(() => {
-      fb.classList.add('show');
-      setTimeout(() => fb.classList.remove('show'), 2500);
-    }).catch(() => {
-      area.select();
-      try { document.execCommand('copy'); fb.classList.add('show'); setTimeout(() => fb.classList.remove('show'), 2500); } catch(_) {}
-    });
-  });
-
-  // ── INIT ─────────────────────────────────────────────────────
-  loadData().catch(err => {
-    console.error(err);
-    setStatus('error', 'Error al cargar');
-    document.getElementById('loading-view').innerHTML = `
-      <div style="text-align:center;padding:48px 24px;color:var(--muted)">
-        <div style="font-size:32px;margin-bottom:12px">⚠️</div>
-        <div style="font-size:14px;margin-bottom:8px">Error al cargar datos</div>
-        <div style="font-size:12px;color:var(--faint)">${escHtml(err.message)}</div>
-        <button class="btn btn-ghost" style="margin-top:16px" onclick="location.reload()">Reintentar</button>
-      </div>
-    `;
-  });
-})();
+['fDesde','fHasta','fRed','fProyecto'].forEach(id=>document.getElementById(id).addEventListener('change',render));
+render();
 </script>
+</body>
+</html>
