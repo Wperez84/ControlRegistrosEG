@@ -91,8 +91,43 @@ footer .disclaimer strong { color: var(--text); }
   header h1 { font-size: 15px; }
 }
 </style>
+<style>
+#gate { position:fixed; inset:0; background:#0f1117; display:flex; align-items:center; justify-content:center; z-index:9999; }
+.gate-box { background:#1a1d27; border:1px solid #2a2d3e; border-radius:12px; padding:36px 32px; width:100%; max-width:340px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+.gate-box svg { margin-bottom:4px; }
+.gate-box h2 { font-size:16px; font-weight:600; text-align:center; }
+.gate-box p { font-size:12px; color:#94a3b8; text-align:center; }
+#gateInput { width:100%; background:#20243a; border:1px solid #2a2d3e; color:#f1f5f9; padding:10px 14px; border-radius:8px; font-size:15px; font-family:inherit; text-align:center; letter-spacing:2px; }
+#gateInput:focus { outline:2px solid #f97316; }
+#gateErr { color:#ef4444; font-size:12px; display:none; }
+#gateBtn { background:#f97316; color:#fff; border:none; border-radius:8px; padding:10px 32px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; width:100%; }
+#gateBtn:hover { opacity:.88; }
+</style>
 </head>
 <body>
+
+<div id="gate">
+  <div class="gate-box">
+    <svg viewBox="0 0 120 36" width="110" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="4" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#e8001c" letter-spacing="-1">GRUPO</text>
+      <text x="76" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#f1f5f9" letter-spacing="-1">LPG</text>
+    </svg>
+    <h2>Reporte de Pauta — ELF</h2>
+    <p>Ingresa la contraseña para acceder</p>
+    <input id="gateInput" type="password" placeholder="••••••••••" autocomplete="current-password">
+    <span id="gateErr">Contraseña incorrecta</span>
+    <button id="gateBtn" onclick="checkPass()">Ingresar</button>
+  </div>
+</div>
+<script>
+(function(){try{if(sessionStorage.getItem('lpg_elf_ok')==='1')document.getElementById('gate').style.display='none';}catch(e){}})();
+function checkPass(){
+  const v=document.getElementById('gateInput').value;
+  if(v==='1234567890'){try{sessionStorage.setItem('lpg_elf_ok','1');}catch(e){}document.getElementById('gate').style.display='none';}
+  else{document.getElementById('gateErr').style.display='block';document.getElementById('gateInput').value='';}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPass();});
+</script>
 
 <header>
   <div class="badge">ELF</div>
