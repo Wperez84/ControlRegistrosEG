@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONSTANCIA Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #1a1d27;
+  --card2: #20243a;
+  --border: #2a2d3e;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #f97316;
+  --blue: #3b82f6;
+  --green: #10b981;
+  --red: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; }
+
+header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.badge { background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 6px; letter-spacing: 1px; text-transform: uppercase; }
+header h1 { font-size: 18px; font-weight: 600; }
+header span.sub { color: var(--muted); font-size: 13px; }
+
+.filters { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.filter-group input, .filter-group select {
+  background: var(--card2); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; border-radius: 6px; font-size: 13px; font-family: inherit;
+  min-width: 130px;
+}
+.filter-group input:focus, .filter-group select:focus { outline: 2px solid var(--accent); }
+.btn { padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; }
+.btn-clear { background: var(--border); color: var(--text); }
+.btn-export { background: var(--accent); color: #fff; }
+.btn:hover { opacity: .85; }
+
+.kpis { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; }
+.kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 140px; }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 6px; }
+.kpi-val { font-size: 26px; font-weight: 700; }
+.kpi-val.accent { color: var(--accent); }
+.kpi-val.blue { color: var(--blue); }
+.kpi-val.green { color: var(--green); }
+
+.section { padding: 0 16px 16px; }
+.section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 10px; }
+
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--card2); padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); white-space: nowrap; }
+td { padding: 9px 12px; border-top: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tr:hover td { background: rgba(255,255,255,.03); }
+td a { color: var(--accent); text-decoration: none; }
+td a:hover { text-decoration: underline; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.blue { color: var(--blue); }
+.green { color: var(--green); }
+.tag { display: inline-block; background: var(--card2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11px; }
+
+.previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.preview-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.preview-meta { padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+.preview-meta .p-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.preview-meta .p-sub { font-size: 11px; color: var(--muted); }
+.preview-card iframe { display: block; width: 100%; border: none; }
+.preview-card.vertical { max-width: 200px; justify-self: center; }
+.link-card { padding: 16px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.link-card:hover { background: var(--card2); }
+.link-icon { font-size: 24px; }
+.link-url { font-size: 11px; color: var(--muted); word-break: break-all; }
+
+.empty { text-align: center; color: var(--muted); padding: 40px; }
+
+.grupo-logo { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.grupo-logo svg { height: 28px; width: auto; opacity: .85; }
+.grupo-name { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); line-height: 1.2; }
+
+footer { background: var(--card); border-top: 1px solid var(--border); padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+footer .disclaimer { font-size: 11px; color: var(--muted); line-height: 1.5; }
+footer .disclaimer strong { color: var(--text); }
+
+@media(max-width:600px) {
+  .kpi-val { font-size: 20px; }
+  header h1 { font-size: 15px; }
+}
+</style>
+<style>
+#gate { position:fixed; inset:0; background:#0f1117; display:flex; align-items:center; justify-content:center; z-index:9999; }
+.gate-box { background:#1a1d27; border:1px solid #2a2d3e; border-radius:12px; padding:36px 32px; width:100%; max-width:340px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+.gate-box svg { margin-bottom:4px; }
+.gate-box h2 { font-size:16px; font-weight:600; text-align:center; }
+.gate-box p { font-size:12px; color:#94a3b8; text-align:center; }
+#gateInput { width:100%; background:#20243a; border:1px solid #2a2d3e; color:#f1f5f9; padding:10px 14px; border-radius:8px; font-size:15px; font-family:inherit; text-align:center; letter-spacing:2px; }
+#gateInput:focus { outline:2px solid #f97316; }
+#gateErr { color:#ef4444; font-size:12px; display:none; }
+#gateBtn { background:#f97316; color:#fff; border:none; border-radius:8px; padding:10px 32px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; width:100%; }
+#gateBtn:hover { opacity:.88; }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <svg viewBox="0 0 120 36" width="110" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="4" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#e8001c" letter-spacing="-1">GRUPO</text>
+      <text x="76" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#f1f5f9" letter-spacing="-1">LPG</text>
+    </svg>
+    <h2>Reporte de Pauta — CONSTANCIA</h2>
+    <p>Ingresa la contraseña para acceder</p>
+    <input id="gateInput" type="password" placeholder="••••••••••" autocomplete="current-password">
+    <span id="gateErr">Contraseña incorrecta</span>
+    <button id="gateBtn" onclick="checkPass()">Ingresar</button>
+  </div>
+</div>
+<script>
+(function(){try{if(sessionStorage.getItem('lpg_constancia_ok')==='1')document.getElementById('gate').style.display='none';}catch(e){}})();
+function checkPass(){
+  const v=document.getElementById('gateInput').value;
+  if(v==='1234567890'){try{sessionStorage.setItem('lpg_constancia_ok','1');}catch(e){}document.getElementById('gate').style.display='none';}
+  else{document.getElementById('gateErr').style.display='block';document.getElementById('gateInput').value='';}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPass();});
+</script>
+
+<header>
+  <div class="badge">CONSTANCIA</div>
+  <div>
+    <h1>Dashboard de Pauta</h1>
+    <span class="sub">Datos estáticos generados el 2026-11-10</span>
+  </div>
+  <button class="btn btn-export" onclick="exportCSV()" style="margin-left:auto;">Exportar CSV</button>
+  <div class="grupo-logo">
+    <svg viewBox="0 0 120 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="36" rx="4" fill="none"/>
+      <text x="4" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#e8001c" letter-spacing="-1">GRUPO</text>
+      <text x="76" y="26" font-family="Arial,sans-serif" font-weight="900" font-size="22" fill="#f1f5f9" letter-spacing="-1">LPG</text>
+    </svg>
+  </div>
+</header>
+
+<div class="filters">
+  <div class="filter-group">
+    <label>Fecha desde</label>
+    <input type="date" id="fDesde">
+  </div>
+  <div class="filter-group">
+    <label>Fecha hasta</label>
+    <input type="date" id="fHasta">
+  </div>
+  <div class="filter-group">
+    <label>Red</label>
+    <select id="fRed"><option value="">Todas</option></select>
+  </div>
+  <div class="filter-group">
+    <label>Proyecto</label>
+    <select id="fProyecto"><option value="">Todos</option></select>
+  </div>
+  <div style="display:flex;align-items:flex-end;">
+    <button class="btn btn-clear" onclick="clearFilters()">Limpiar</button>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kpi-label">Registros</div><div class="kpi-val accent" id="kRegistros">0</div></div>
+  <div class="kpi"><div class="kpi-label">Total Alcance</div><div class="kpi-val blue" id="kAlcances">0</div></div>
+  <div class="kpi"><div class="kpi-label">Total Interacciones</div><div class="kpi-val green" id="kInteracciones">0</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Tabla de pautas</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Proyecto</th><th>Red</th><th>Marca</th>
+          <th>Tipo de Pauta</th><th class="num">Alcance</th><th class="num">Interacciones</th><th>Link</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Previews (hasta 9)</div>
+  <div class="previews" id="previewGrid"></div>
+</div>
+
+<script>
+const DATA = [{"id":"constancia-1","fecha":"2026-10-26","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/DmroIwKPeuw?si=U0xma-3YMzgu1tQY&t=4011","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6888,"interacciones":115},{"id":"constancia-2","fecha":"2026-10-26","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/DmroIwKPeuw?si=ya5DNJ_WA9cUDmwx&t=3336","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6888,"interacciones":115},{"id":"constancia-3","fecha":"2026-10-26","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/DmroIwKPeuw?si=BwGl1vL6tCXmBUnv&t=3624","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6888,"interacciones":115},{"id":"constancia-4","fecha":"2026-10-26","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/DmroIwKPeuw?si=gY07XfoABn_K7b5r&t=3586","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6888,"interacciones":115},{"id":"constancia-5","fecha":"2026-10-23","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/gjHjJJLj2Do?si=w7vOJ8qY3wZ3F-bM&t=2191","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":3904,"interacciones":65},{"id":"constancia-6","fecha":"2026-10-23","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/gjHjJJLj2Do?si=uVM1tRRkERLtniZJ&t=2346","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":3904,"interacciones":65},{"id":"constancia-7","fecha":"2026-10-23","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/gjHjJJLj2Do?si=AuF5o6qc8yBRbDMD&t=2206","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":3904,"interacciones":65},{"id":"constancia-8","fecha":"2026-10-23","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/gjHjJJLj2Do?si=9ILVR3Wl2zL7VFrV&t=2191","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":3904,"interacciones":65},{"id":"constancia-9","fecha":"2026-10-22","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/YLV83Vkw-Og?si=UcKQQeyxSescXErL&t=3315","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6459,"interacciones":97},{"id":"constancia-10","fecha":"2026-10-22","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/YLV83Vkw-Og?si=TTswYn4tZ7bveenk&t=2694","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6459,"interacciones":97},{"id":"constancia-11","fecha":"2026-10-22","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/YLV83Vkw-Og?si=4LWB3V5UBreXnbb3&t=2554","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6459,"interacciones":97},{"id":"constancia-12","fecha":"2026-10-22","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/YLV83Vkw-Og?si=MTT6Zuw9E1Q_le0E&t=2538","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6459,"interacciones":97},{"id":"constancia-13","fecha":"2026-10-21","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/XRQxMZE2ssQ?si=B5dLJdSKADBgUav7&t=3184","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6731,"interacciones":140},{"id":"constancia-14","fecha":"2026-10-21","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/XRQxMZE2ssQ?si=D3C7W24qt5gBU4wH&t=2292","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6731,"interacciones":140},{"id":"constancia-15","fecha":"2026-10-21","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Cortina","link":"https://www.youtube.com/live/XRQxMZE2ssQ?si=pmO0K_qsEQQqRXSD&t=2836","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6731,"interacciones":140},{"id":"constancia-16","fecha":"2026-10-21","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/XRQxMZE2ssQ?si=a2ef9NlLV3j--UTD&t=2795","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":6731,"interacciones":140},{"id":"constancia-17","fecha":"2026-10-20","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/g_FIWVEScuo?si=sV6Z2ItYeCaWvWys&t=2532","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":8702,"interacciones":179},{"id":"constancia-18","fecha":"2026-10-20","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/g_FIWVEScuo?si=Yv3XUDTyuLq_h0jp&t=2477","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":8702,"interacciones":179},{"id":"constancia-19","fecha":"2026-10-19","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/_leXnsVTalg?si=7mUrMa5wzuz8hDoQ&t=3600","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7617,"interacciones":131},{"id":"constancia-20","fecha":"2026-10-19","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/_leXnsVTalg?si=_n1NVv8R8oFgY0pp&t=4156","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7617,"interacciones":131},{"id":"constancia-21","fecha":"2026-10-19","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/_leXnsVTalg?si=cS2N9ac1dfXlHtz2&t=4069","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7617,"interacciones":131},{"id":"constancia-22","fecha":"2026-10-16","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/HFGb94A-KtU?si=bqNJQGAh_Xe45jkF&t=2930","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":4797,"interacciones":96},{"id":"constancia-23","fecha":"2026-10-16","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/HFGb94A-KtU?si=EWjud26JAldiiWRT&t=1681","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":4797,"interacciones":96},{"id":"constancia-24","fecha":"2026-10-16","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/HFGb94A-KtU?si=HO-iSnRHQxxn9szi&t=2207","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":4797,"interacciones":96},{"id":"constancia-25","fecha":"2026-10-16","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/HFGb94A-KtU?si=iFTI_nmKgj7Md7gV&t=2107","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":4797,"interacciones":96},{"id":"constancia-26","fecha":"2026-10-15","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/AoTraMFngw8?si=nm9IsOoFUEQjE6y5&t=2991","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7964,"interacciones":124},{"id":"constancia-27","fecha":"2026-10-15","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/AoTraMFngw8?si=FM13Zoi-DcMC5dC9&t=2056","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7964,"interacciones":124},{"id":"constancia-28","fecha":"2026-10-15","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/AoTraMFngw8?si=PLSZT-yGUcfa0fQq&t=2621","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7964,"interacciones":124},{"id":"constancia-29","fecha":"2026-10-15","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/AoTraMFngw8?si=ZDBLfwV4XkIjtoHc&t=2548","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":7964,"interacciones":124},{"id":"constancia-30","fecha":"2026-10-14","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/Z2eEgI5NgFs?si=Lo4J3B-r08Y-kNHZ&t=3432","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":8182,"interacciones":167},{"id":"constancia-31","fecha":"2026-10-14","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/Z2eEgI5NgFs?si=rI9JSP9Lf1dijhIZ&t=3358","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":8182,"interacciones":167},{"id":"constancia-32","fecha":"2026-10-14","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/Z2eEgI5NgFs?si=u4AyyvWpzV2L4Ita&t=3698","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":8182,"interacciones":167},{"id":"constancia-33","fecha":"2026-10-14","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/Z2eEgI5NgFs?si=7gdANHgx8z7cAsPd&t=2450","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":8182,"interacciones":167},{"id":"constancia-34","fecha":"2026-10-07","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/GMLzWZ3Oozw?si=iWH6UN-ytn1p1qJQ&t=3225","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":18975,"interacciones":308},{"id":"constancia-35","fecha":"2026-10-07","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/GMLzWZ3Oozw?si=QUTTZymxEDq2ccuS&t=2377","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":18975,"interacciones":308},{"id":"constancia-36","fecha":"2026-10-08","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/CEIGKrL2YWA?si=_x2sR7R8lScWpUe0&t=3198","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":20562,"interacciones":389},{"id":"constancia-37","fecha":"2026-10-08","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/CEIGKrL2YWA?si=ANZdjA-_1BlwwP2V&t=2191","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":20562,"interacciones":389},{"id":"constancia-38","fecha":"2026-10-09","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/InhAO9Js7ig?si=8eG1IsJuxyt0p0hG&t=2845","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11194,"interacciones":202},{"id":"constancia-39","fecha":"2026-10-09","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/InhAO9Js7ig?si=A5d1nv4v7EhLXgO5&t=1237","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11194,"interacciones":202},{"id":"constancia-40","fecha":"2026-10-12","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/7fPJXFhMHD8?si=9T8PSHtaWrMQ_FJZ&t=4089","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11204,"interacciones":185},{"id":"constancia-41","fecha":"2026-10-12","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/7fPJXFhMHD8?si=5LvAJyW5ttOuWmQ0&t=3417","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11204,"interacciones":185},{"id":"constancia-42","fecha":"2026-10-13","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/_NtrzKdUFfA?si=MgAb5I2_-NY1riTd&t=3184","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":19852,"interacciones":457},{"id":"constancia-43","fecha":"2026-10-13","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Menciones","link":"https://www.youtube.com/live/_NtrzKdUFfA?si=xTNMDkOdhhAkkBwo&t=4062","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":19852,"interacciones":457},{"id":"constancia-44","fecha":"2026-10-13","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/_NtrzKdUFfA?si=H38QYOS2RSb0YiUF&t=3784","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":19852,"interacciones":457},{"id":"constancia-45","fecha":"2026-10-13","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/_NtrzKdUFfA?si=EOvXVL88xa1bPo4X&t=3712","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":19852,"interacciones":457},{"id":"constancia-46","fecha":"2026-10-12","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/7fPJXFhMHD8?si=ANwdsDZMMC9280YN&t=4229","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11204,"interacciones":185},{"id":"constancia-47","fecha":"2026-10-12","red":"OTRO","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/7fPJXFhMHD8?si=qGRo-bCIAVebWeEi&t=4107","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11204,"interacciones":185},{"id":"constancia-48","fecha":"2026-10-09","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/InhAO9Js7ig?si=VW0frIZ79nlFAhZ4&t=2998","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11194,"interacciones":202},{"id":"constancia-49","fecha":"2026-10-09","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot/Mención/Pleca","link":"https://www.youtube.com/live/InhAO9Js7ig?si=wmy3LBrMHlEbgMxg&t=2877","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":11194,"interacciones":202},{"id":"constancia-50","fecha":"2026-10-08","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/CEIGKrL2YWA?si=wJ20HS9PQcFjFObL&t=2665","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":20562,"interacciones":389},{"id":"constancia-51","fecha":"2026-10-08","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/CEIGKrL2YWA?si=8X5lMmQ2adLKnFX4&t=2567","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":20562,"interacciones":389},{"id":"constancia-52","fecha":"2026-10-07","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/GMLzWZ3Oozw?si=N7VNo282QrCFbUZu&t=2648","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":18975,"interacciones":308},{"id":"constancia-53","fecha":"2026-10-07","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/GMLzWZ3Oozw?si=LuNf9XLQouonUZ4N&t=2562","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":18975,"interacciones":308},{"id":"constancia-54","fecha":"2026-10-06","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/SuKkIb14Org?si=FPLdDfzO9sUGQ0Iy&t=3334","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":24672,"interacciones":518},{"id":"constancia-55","fecha":"2026-10-06","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/SuKkIb14Org?si=Ts6iwbeBQPu5JT_t&t=3245","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":24672,"interacciones":518},{"id":"constancia-56","fecha":"2026-10-05","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/ngKIkcbNrIY?si=6fLPWM6gJH7gL6MJ&t=3495","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":41956,"interacciones":661},{"id":"constancia-57","fecha":"2026-10-05","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/ngKIkcbNrIY?si=nIVLav531RMVDsTY&t=3415","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":41956,"interacciones":661},{"id":"constancia-58","fecha":"2026-10-02","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/4EP3qK-sof0?si=xeWT0GUq-b_ad2RK&t=3350","categoria":"","notas":"","productoId":"","productoNombre":"Liga de Naciones","alcances":29625,"interacciones":738},{"id":"constancia-59","fecha":"2026-10-02","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/4EP3qK-sof0?si=MLFK0E_1hVxJErLD&t=3248","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":29625,"interacciones":738},{"id":"constancia-60","fecha":"2026-10-01","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/TnY4VgBtoiQ?si=RosDwEvMaF93KNWh&t=2088","categoria":"","notas":"","productoId":"","productoNombre":"Liga de Naciones","alcances":14719,"interacciones":291},{"id":"constancia-61","fecha":"2026-10-01","red":"YOUTUBE","marca":"EGTV","tipoPauta":"Spot","link":"https://www.youtube.com/live/TnY4VgBtoiQ?si=DwsBTs-UHkgsfGn9&t=1979","categoria":"","notas":"","productoId":"","productoNombre":"Pauta Habitual","alcances":14719,"interacciones":291}];
+
+function fmt(n){return n.toLocaleString('es-GT');}
+
+function extractYouTubeId(url){
+  if(!url) return null;
+  let m;
+  m = url.match(/[?&]v=([^&#]+)/); if(m) return m[1];
+  m = url.match(/\/shorts\/([^/?&#]+)/); if(m) return m[1];
+  m = url.match(/\/live\/([^/?&#]+)/); if(m) return m[1];
+  m = url.match(/youtu\.be\/([^/?&#]+)/); if(m) return m[1];
+  return null;
+}
+
+function isYouTubeShortOrLive(url){
+  return url && (url.includes('/shorts/') || url.includes('/live/'));
+}
+
+function getYouTubeEmbedUrl(url){
+  const id = extractYouTubeId(url);
+  if(!id) return null;
+  return 'https://www.youtube.com/embed/'+id;
+}
+
+// Populate selects
+const reds = [...new Set(DATA.map(d=>d.red).filter(Boolean))].sort();
+const proyectos = [...new Set(DATA.map(d=>d.productoNombre).filter(Boolean))].sort();
+const selRed = document.getElementById('fRed');
+const selProy = document.getElementById('fProyecto');
+reds.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;selRed.appendChild(o);});
+proyectos.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;selProy.appendChild(o);});
+
+function getFiltered(){
+  const desde = document.getElementById('fDesde').value;
+  const hasta = document.getElementById('fHasta').value;
+  const red = selRed.value;
+  const proy = selProy.value;
+  return DATA.filter(d=>{
+    if(desde && d.fecha < desde) return false;
+    if(hasta && d.fecha > hasta) return false;
+    if(red && d.red !== red) return false;
+    if(proy && d.productoNombre !== proy) return false;
+    return true;
+  });
+}
+
+function render(){
+  const filtered = getFiltered();
+  // KPIs
+  function ytId(link){if(!link)return null;const m=link.match(/[?&]v=([a-zA-Z0-9_-]{6,})/)||link.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/i)||link.match(/youtube\.com\/(?:shorts|live|embed)\/([a-zA-Z0-9_-]{6,})/i);return m?m[1]:null;}
+  const seenYt=new Set();
+  let totAlc=0,totInt=0;
+  filtered.forEach(d=>{const yt=ytId(d.link);if(yt){if(seenYt.has(yt))return;seenYt.add(yt);}totAlc+=d.alcances;totInt+=d.interacciones;});
+  document.getElementById('kRegistros').textContent = fmt(filtered.length);
+  document.getElementById('kAlcances').textContent = fmt(totAlc);
+  document.getElementById('kInteracciones').textContent = fmt(totInt);
+
+  // Table
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  filtered.forEach(d=>{
+    const tr = document.createElement('tr');
+    const short = d.link ? (d.link.length>40 ? d.link.slice(0,40)+'…' : d.link) : '';
+    tr.innerHTML = '<td>'+d.fecha+'</td>'+
+      '<td><span class="tag">'+escH(d.productoNombre||'')+'</span></td>'+
+      '<td>'+escH(d.red||'')+'</td>'+
+      '<td>'+escH(d.marca||'')+'</td>'+
+      '<td>'+escH(d.tipoPauta||'')+'</td>'+
+      '<td class="num blue">'+fmt(d.alcances)+'</td>'+
+      '<td class="num green">'+fmt(d.interacciones)+'</td>'+
+      '<td>'+(d.link?'<a href="'+escH(d.link)+'" target="_blank" rel="noopener">'+escH(short)+'</a>':'')+'</td>';
+    tbody.appendChild(tr);
+  });
+  if(!filtered.length){
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="8" class="empty">Sin resultados</td>';
+    tbody.appendChild(tr);
+  }
+
+  // Previews
+  const grid = document.getElementById('previewGrid');
+  grid.innerHTML = '';
+  const ytItems = filtered.filter(d=>d.link && extractYouTubeId(d.link));
+  const shown = ytItems.slice(0,9);
+  shown.forEach(d=>{
+    const embedUrl = getYouTubeEmbedUrl(d.link);
+    const isShort = isYouTubeShortOrLive(d.link) && d.link.includes('/shorts/');
+    const card = document.createElement('div');
+    card.className = 'preview-card'+(isShort?' vertical':'');
+    const metaHtml = '<div class="preview-meta"><div class="p-title">'+escH(d.fecha+' · '+d.marca)+'</div><div class="p-sub">'+escH(d.tipoPauta||'')+'</div></div>';
+    if(isShort){
+      card.innerHTML = metaHtml+'<iframe src="'+embedUrl+'" style="height:70vh;width:calc(70vh * 9/16);" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    } else {
+      card.innerHTML = metaHtml+'<iframe src="'+embedUrl+'" height="200" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    }
+    grid.appendChild(card);
+  });
+
+  // Non-YT links for remaining slots
+  if(shown.length < 9){
+    const nonYt = filtered.filter(d=>d.link && !extractYouTubeId(d.link));
+    nonYt.slice(0, 9-shown.length).forEach(d=>{
+      const card = document.createElement('div');
+      card.className = 'preview-card';
+      const short = d.link.length>60?d.link.slice(0,60)+'…':d.link;
+      card.innerHTML = '<div class="preview-meta"><div class="p-title">'+escH(d.fecha+' · '+d.marca)+'</div><div class="p-sub">'+escH(d.tipoPauta||'')+'</div></div>'+
+        '<a class="link-card" href="'+escH(d.link)+'" target="_blank" rel="noopener"><span class="link-icon">🔗</span><span class="link-url">'+escH(short)+'</span></a>';
+      grid.appendChild(card);
+    });
+  }
+
+  if(!filtered.length || (ytItems.length===0 && filtered.filter(d=>d.link).length===0)){
+    if(!grid.children.length) grid.innerHTML='<p class="empty">Sin contenido para previsualizar</p>';
+  }
+}
+
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function clearFilters(){
+  document.getElementById('fDesde').value='';
+  document.getElementById('fHasta').value='';
+  selRed.value='';
+  selProy.value='';
+  render();
+}
+
+function exportCSV(){
+  const filtered = getFiltered();
+  const cols = ['id','fecha','red','marca','tipoPauta','link','categoria','notas','productoId','productoNombre','alcances','interacciones'];
+  const header = cols.join(',');
+  const rows = filtered.map(d=>cols.map(c=>{
+    const v = d[c]===undefined?'':String(d[c]);
+    return '"'+v.replace(/"/g,'""')+'"';
+  }).join(','));
+  const bom = '﻿';
+  const csv = bom+header+'\n'+rows.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'Constancia-pauta.csv';
+  a.click();
+}
+
+['fDesde','fHasta','fRed','fProyecto'].forEach(id=>document.getElementById(id).addEventListener('change',render));
+render();
+</script>
+
+<footer>
+  <div class="disclaimer">
+    <strong>Gerencia Comercial Digital — Grupo LPG</strong><br>
+    La información contenida en este reporte es de uso interno y exclusivo para la Gerencia Comercial Digital de Grupo La Prensa Gráfica.
+    Los datos reflejan el registro de pauta y métricas de alcance e interacciones proporcionados por las plataformas digitales.
+    No debe ser reproducida, distribuida ni compartida fuera del equipo autorizado.
+  </div>
+</footer>
+</body>
+</html>

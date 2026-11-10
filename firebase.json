@@ -4,8 +4,9 @@
     "site": "controlregistroseg", "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
-      { "source": "/reportes/ELF",      "destination": "/reportes/ELF.html" },
-      { "source": "/reportes/Toyota",   "destination": "/reportes/Toyota.html" },
+      { "source": "/reportes/ELF",         "destination": "/reportes/ELF.html" },
+      { "source": "/reportes/Toyota",      "destination": "/reportes/Toyota.html" },
+      { "source": "/reportes/Constancia",  "destination": "/reportes/Constancia.html" },
       { "source": "**", "destination": "/index.html" }
     ]
   }
