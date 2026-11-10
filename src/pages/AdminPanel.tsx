@@ -4,7 +4,7 @@ import type { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, query, orderBy } from 'firebase/firestore';
 import type { Producto, Cliente, Registro, Metrica, RegistroCompleto } from '../types';
-import { normLink } from '../lib/normLink';
+import { normLink, extractYoutubeId } from '../lib/normLink';
 import { fetchYoutubeStats } from '../lib/youtube';
 import { parseCSV } from '../lib/csv';
 
@@ -40,9 +40,8 @@ function agruparRegistrosYoutubePorVideo(registros: RegistroCompleto[]): Record<
   const porVideo: Record<string, RegistroCompleto[]> = {};
   registros.forEach(r => {
     if (r.red !== 'YOUTUBE') return;
-    const nk = normLink(r.link);
-    if (!nk.startsWith('youtube:')) return;
-    const id = nk.slice('youtube:'.length);
+    const id = extractYoutubeId(r.link);
+    if (!id) return;
     (porVideo[id] ??= []).push(r);
   });
   return porVideo;
