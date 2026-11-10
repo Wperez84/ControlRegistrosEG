@@ -207,10 +207,17 @@ function isYouTubeShortOrLive(url){
   return url && (url.includes('/shorts/') || url.includes('/live/'));
 }
 
+function extractStartSeconds(url){
+  if(!url) return 0;
+  const m = url.match(/[?&]t=(\d+)/);
+  return m ? parseInt(m[1],10) : 0;
+}
+
 function getYouTubeEmbedUrl(url){
   const id = extractYouTubeId(url);
   if(!id) return null;
-  return 'https://www.youtube.com/embed/'+id;
+  const start = extractStartSeconds(url);
+  return 'https://www.youtube.com/embed/'+id+(start?'?start='+start:'');
 }
 
 // Populate selects
