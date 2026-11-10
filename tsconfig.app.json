@@ -10,5 +10,5 @@
     "noFallthroughCasesInSwitch": true, "verbatimModuleSyntax": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "firebase-applet-config.json"]
+  "include": ["src", "firebase-applet-config.json", "youtube-config.json"]
 }

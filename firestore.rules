@@ -25,7 +25,7 @@ service cloud.firestore {
         && request.resource.data.creadoEn == resource.data.creadoEn;
       allow delete: if isAdmin() || (isEditor() && request.auth.uid == resource.data.creadoPor);
     }
-    match /metricas/{registroId} { allow read: if isEditor() || isClienteAutorizado(resource.data.clienteId); allow write: if false; }
+    match /metricas/{registroId} { allow read: if isEditor() || isClienteAutorizado(resource.data.clienteId); allow write: if isEditor(); }
     match /presence/{uid} { allow read: if isAdmin(); allow write: if isEditor() && request.auth.uid == uid; }
     match /actividad/{docId} { allow read: if isAdmin(); allow create: if isEditor(); }
   }

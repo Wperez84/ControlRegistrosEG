@@ -2,9 +2,10 @@ import React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import type { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, query, orderBy } from 'firebase/firestore';
 import type { Producto, Cliente, Registro, Metrica, RegistroCompleto } from '../types';
 import { normLink } from '../lib/normLink';
+import { fetchYoutubeStats } from '../lib/youtube';
 
 const SUPER_ADMINS = ['wperez@laprensagrafica.com', 'chuete@laprensagrafica.com'];
 const REDES = ['INSTAGRAM', 'FACEBOOK', 'YOUTUBE', 'X', 'TIKTOK', 'SITIO WEB', 'OTRO'] as const;
@@ -185,6 +186,8 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
   const [editando, setEditando] = useState<RegistroCompleto | null>(null);
   const [sortCol, setSortCol] = useState<'fecha' | 'alcances' | 'interacciones' | null>(null);
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
+  const [actualizandoYt, setActualizandoYt] = useState(false);
+  const [ytMsg, setYtMsg] = useState('');
   const isAdmin = SUPER_ADMINS.includes(user.email ?? '');
 
   function toggleSort(col: typeof sortCol) {
@@ -249,6 +252,44 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
     await deleteDoc(doc(db, 'registros', r.id));
   }
 
+  async function handleActualizarYoutube() {
+    setActualizandoYt(true);
+    setYtMsg('');
+    try {
+      const porVideo: Record<string, RegistroCompleto[]> = {};
+      registros.forEach(r => {
+        if (r.red !== 'YOUTUBE') return;
+        const nk = normLink(r.link);
+        if (!nk.startsWith('youtube:')) return;
+        const id = nk.slice('youtube:'.length);
+        (porVideo[id] ??= []).push(r);
+      });
+      const ids = Object.keys(porVideo);
+      if (ids.length === 0) { setYtMsg('No hay registros de YouTube para actualizar.'); return; }
+
+      const stats = await fetchYoutubeStats(ids);
+      let actualizados = 0;
+      for (const [id, regs] of Object.entries(porVideo)) {
+        const s = stats[id];
+        if (!s) continue;
+        for (const r of regs) {
+          await setDoc(doc(db, 'metricas', r.id), {
+            alcances: s.viewCount,
+            interacciones: s.likeCount + s.commentCount,
+            actualizadoEn: Date.now(),
+          });
+          actualizados++;
+        }
+      }
+      const sinDatos = ids.length - Object.keys(stats).length;
+      setYtMsg(`Actualizados ${actualizados} registro(s) de ${ids.length} video(s) de YouTube.` + (sinDatos > 0 ? ` ${sinDatos} video(s) no devolvieron datos (privados/eliminados).` : ''));
+    } catch (e) {
+      setYtMsg(e instanceof Error ? e.message : 'Error al actualizar métricas de YouTube.');
+    } finally {
+      setActualizandoYt(false);
+    }
+  }
+
   const SortBtn = ({ col, label }: { col: typeof sortCol; label: string }) => (
     <button onClick={() => toggleSort(col)}
       className={`flex items-center gap-0.5 text-[9px] tracking-widest uppercase font-medium whitespace-nowrap transition-colors ${sortCol === col ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -259,7 +300,12 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end items-center gap-2">
+        {ytMsg && <p className="text-[10px] text-gray-500 mr-auto">{ytMsg}</p>}
+        <button onClick={handleActualizarYoutube} disabled={actualizandoYt}
+          className="text-[10px] font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50">
+          {actualizandoYt ? 'Actualizando…' : '▶ Actualizar métricas YouTube'}
+        </button>
         <button onClick={exportCSV}
           className="text-[10px] font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">
           ↓ Exportar CSV ({filtered.length})
