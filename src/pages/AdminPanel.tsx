@@ -1,11 +1,12 @@
 import React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import type { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, query, orderBy } from 'firebase/firestore';
 import type { Producto, Cliente, Registro, Metrica, RegistroCompleto } from '../types';
 import { normLink } from '../lib/normLink';
 import { fetchYoutubeStats } from '../lib/youtube';
+import { parseCSV } from '../lib/csv';
 
 const SUPER_ADMINS = ['wperez@laprensagrafica.com', 'chuete@laprensagrafica.com'];
 const REDES = ['INSTAGRAM', 'FACEBOOK', 'YOUTUBE', 'X', 'TIKTOK', 'SITIO WEB', 'OTRO'] as const;
@@ -33,6 +34,18 @@ function validarLink(link: string, red: string): string | null {
       return `El link no parece ser de ${red}. Se esperan: ${dominios.join(', ')}`;
   } catch { return 'URL inválida'; }
   return null;
+}
+
+function agruparRegistrosYoutubePorVideo(registros: RegistroCompleto[]): Record<string, RegistroCompleto[]> {
+  const porVideo: Record<string, RegistroCompleto[]> = {};
+  registros.forEach(r => {
+    if (r.red !== 'YOUTUBE') return;
+    const nk = normLink(r.link);
+    if (!nk.startsWith('youtube:')) return;
+    const id = nk.slice('youtube:'.length);
+    (porVideo[id] ??= []).push(r);
+  });
+  return porVideo;
 }
 
 const inp = "w-full bg-transparent border-b border-gray-200 px-0 py-2 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-black/30 transition-colors";
@@ -188,6 +201,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
   const [actualizandoYt, setActualizandoYt] = useState(false);
   const [ytMsg, setYtMsg] = useState('');
+  const csvInputRef = useRef<HTMLInputElement>(null);
   const isAdmin = SUPER_ADMINS.includes(user.email ?? '');
 
   function toggleSort(col: typeof sortCol) {
@@ -256,14 +270,7 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
     setActualizandoYt(true);
     setYtMsg('');
     try {
-      const porVideo: Record<string, RegistroCompleto[]> = {};
-      registros.forEach(r => {
-        if (r.red !== 'YOUTUBE') return;
-        const nk = normLink(r.link);
-        if (!nk.startsWith('youtube:')) return;
-        const id = nk.slice('youtube:'.length);
-        (porVideo[id] ??= []).push(r);
-      });
+      const porVideo = agruparRegistrosYoutubePorVideo(registros);
       const ids = Object.keys(porVideo);
       if (ids.length === 0) { setYtMsg('No hay registros de YouTube para actualizar.'); return; }
 
@@ -290,6 +297,50 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
     }
   }
 
+  async function handleImportarCSVYoutube(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setActualizandoYt(true);
+    setYtMsg('');
+    try {
+      const text = (await file.text()).replace(/^﻿/, '');
+      const rows = parseCSV(text);
+      const header = rows[0] ?? [];
+      const idxId = header.indexOf('Contenido');
+      const idxViews = header.indexOf('Visualizaciones');
+      if (idxId === -1 || idxViews === -1) {
+        throw new Error('El CSV no tiene las columnas esperadas ("Contenido", "Visualizaciones"). Exporta "Datos de la tabla.csv" desde YouTube Studio.');
+      }
+
+      const vistasPorVideo: Record<string, number> = {};
+      for (const row of rows.slice(1)) {
+        const id = row[idxId]?.trim();
+        const views = Number(row[idxViews]);
+        if (!id || id === 'Total' || Number.isNaN(views)) continue;
+        vistasPorVideo[id] = views;
+      }
+
+      const porVideo = agruparRegistrosYoutubePorVideo(registros);
+      let actualizados = 0;
+      let videosConMatch = 0;
+      for (const [id, regs] of Object.entries(porVideo)) {
+        const views = vistasPorVideo[id];
+        if (views === undefined) continue;
+        videosConMatch++;
+        for (const r of regs) {
+          await setDoc(doc(db, 'metricas', r.id), { alcances: views, actualizadoEn: Date.now() }, { merge: true });
+          actualizados++;
+        }
+      }
+      setYtMsg(`CSV importado: ${actualizados} registro(s) actualizados (${videosConMatch} de ${Object.keys(porVideo).length} videos de tus registros coincidieron con el CSV).`);
+    } catch (e) {
+      setYtMsg(e instanceof Error ? e.message : 'Error al importar el CSV.');
+    } finally {
+      setActualizandoYt(false);
+    }
+  }
+
   const SortBtn = ({ col, label }: { col: typeof sortCol; label: string }) => (
     <button onClick={() => toggleSort(col)}
       className={`flex items-center gap-0.5 text-[9px] tracking-widest uppercase font-medium whitespace-nowrap transition-colors ${sortCol === col ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -302,6 +353,11 @@ function VistaRegistros({ registros, productos, clientes, user, filtroCliente, f
     <div className="space-y-4">
       <div className="flex justify-end items-center gap-2">
         {ytMsg && <p className="text-[10px] text-gray-500 mr-auto">{ytMsg}</p>}
+        <input ref={csvInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportarCSVYoutube} />
+        <button onClick={() => csvInputRef.current?.click()} disabled={actualizandoYt}
+          className="text-[10px] font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50">
+          ↑ Importar CSV YouTube
+        </button>
         <button onClick={handleActualizarYoutube} disabled={actualizandoYt}
           className="text-[10px] font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50">
           {actualizandoYt ? 'Actualizando…' : '▶ Actualizar métricas YouTube'}
